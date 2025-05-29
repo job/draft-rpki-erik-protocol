@@ -150,7 +150,7 @@ sn/Qn/snQnoO1WCltT-0ZQDDMDnbmHza1LbXfvj6jVfyAjevI.idx
 
 <artwork>
 <![CDATA[
-$ curl https://example.net/sn/Qn/snQnoO1WCltT-0ZQDDMDnbmHza1LbXfvj6jVfyAjevI.idx
+$ curl -s https://example.net/sn/Qn/snQnoO1WCltT-0ZQDDMDnbmHza1LbXfvj6jVfyAjevI.idx
 A4 m4/nt/m4ntQBsLtR7bIJs6hBS17W7lhdyc2VaZh1RfHqAu1c0.par
 CA 55/ah/55ahOGzBWb4z5dwLh2d8w38G7eSUv-atdwTSeGpGB3w.par
 ]]>
@@ -162,7 +162,7 @@ CA 55/ah/55ahOGzBWb4z5dwLh2d8w38G7eSUv-atdwTSeGpGB3w.par
 
 <artwork>
 <![CDATA[
-$ curl https://example.net/m4/nt/m4ntQBsLtR7bIJs6hBS17W7lhdyc2VaZh1RfHqAu1c0.par
+$ curl -s https://example.net/m4/nt/m4ntQBsLtR7bIJs6hBS17W7lhdyc2VaZh1RfHqAu1c0.par
 pC/We/pCWexo5aHTRHEY33HXaJdlTE0cUlbi2n-d_f0AUoj9w.mft 1746711620 chloe.sobornost.net/rpki/RIPE-nljobsnijders/yqgF26w2R0m5sRVZCrbvD5cM29g.mft
 ]]>
 </artwork>
@@ -170,14 +170,23 @@ pC/We/pCWexo5aHTRHEY33HXaJdlTE0cUlbi2n-d_f0AUoj9w.mft 1746711620 chloe.sobornost
     </section>
 
     <section anchor="rp">
-      <name>Client Behaviour</name>
+      <name>Client-side Processing</name>
       <t>
-        
+        A client can decide whether or not to download Index and Partition objects, by comparing the hash to previous fetches.
+      </t>
+      <t>
+        A client can decide whether or not to download a Manifest object, by comparing the signing timestamp with what's locally cached and available.
+      </t>
+      <t>
+        A client can decide whether or not to download a Manifest object, by comparing the signing timestamp contained in the Partition with most recent locally cached Manifest.
+      </t>
+      <t>
+        A client can compute which products listed in the Manifest's fileList need to be downloaded from the server.
       </t>
     </section>
 
     <section anchor="error">
-      <name>Error detection</name>
+      <name>Error Detection</name>
       <t>
         The client MUST calculate the hash of objects that were downloaded and verify it is the same as the hash embedded in the name through which the object was retrieved.
       </t>
