@@ -204,6 +204,7 @@ pC/We/pCWexo5aHTRHEY33HXaJdlTE0cUlbi2n-d_f0AUoj9w.mft 1746711620 chloe.sobornost
          <li>Is it helpful to have a sharding scheme embedded in the hash-based filenames?</li>
          <li>In Partitions, should a hash of the Manifest SIA be used instead of the bare SIA?</li>
          <li>Should Partitions list the filesize of the referenced Manifests? If the filesizes are known they could be used as offsets in 'bundles' of objects to facilitate bulk downloads / HTTP range requests.</li>
+         <li>Should a binary format be used instead of text files with column?</li>
        </ul>
     </section>
 
