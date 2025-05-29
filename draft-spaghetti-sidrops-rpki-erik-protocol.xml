@@ -167,6 +167,10 @@ pC/We/pCWexo5aHTRHEY33HXaJdlTE0cUlbi2n-d_f0AUoj9w.mft 1746711620 chloe.sobornost
 ]]>
 </artwork>
 
+      <t>
+        Column 1 is the hash of the Manifest object, Column 2 is the timestamp as seconds from the unix epoch, Column 3 is the Manifest's SignedObject SIA.
+      </t>
+
     </section>
 
     <section anchor="rp">
