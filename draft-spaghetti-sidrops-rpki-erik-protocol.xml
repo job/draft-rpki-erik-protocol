@@ -1,0 +1,295 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!DOCTYPE rfc [
+ <!ENTITY nbsp    "&#160;">
+ <!ENTITY zwsp   "&#8203;">
+ <!ENTITY nbhy   "&#8209;">
+ <!ENTITY wj     "&#8288;">
+]>
+
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude"
+category="std"
+docName="draft-spaghetti-sidrops-rpki-erik-protocol-00"
+ipr="trust200902"
+xml:lang="en"
+sortRefs="true"
+submissionType="IETF"
+consensus="true"
+symRefs="true"
+tocInclude="true"
+version="3">
+
+  <front>
+
+    <title abbrev="ERIK Synchronisation Protocol for RPKI">
+      The ERIK Synchronisation Protocol for use with the Resource Public Key Infrastructure (RPKI)
+    </title>
+
+    <author fullname="Job Snijders" initials="J." surname="Snijders">
+      <organization />
+      <address>
+        <postal>
+         <postalLine>Amsterdam</postalLine>
+         <postalLine>The Netherlands</postalLine>
+        </postal>
+        <email>job@sobornost.net</email>
+      </address>
+    </author>
+
+    <author fullname="Tim Bruijnzeels" initials="T." surname="Bruijnzeels">
+      <organization>RIPE NCC</organization>
+      <address>
+        <postal>
+          <country>NL</country>
+        </postal>
+        <email>tim@ripe.net</email>
+      </address>
+    </author>
+
+    <author fullname="Tom Harrison" initials="T." surname="Harrison">
+      <organization>APNIC</organization>
+      <address>
+        <postal>
+          <country>AU</country>
+        </postal>
+        <email>tomh@apnic.net</email>
+      </address>
+    </author>
+
+    <date/>
+
+   <area>Operations and Management Area (OPS)</area>
+   <workgroup>SIDROPS</workgroup>
+
+   <keyword>Data synchronisation</keyword>
+
+    <abstract>
+      <t>
+        This document specifies ERIK, a synchronisation protocol for use with the Resource Public Key Infrastructure (RPKI).
+        The ERIK protocol can be characterized as data replication scheme using a content-addressable naming system with timestamp-based concurrency control transported over HTTP.
+        Relying Parties can combine information retrieved via ERIK with other RPKI transport protocols.
+        The protocol's design is intended to be efficient, fast, and easy to implement.
+      </t>
+    </abstract>
+
+  </front>
+
+  <middle>
+
+    <section anchor="intro">
+      <name>Introduction</name>
+      <t>
+        This document specifies ERIK, a synchronisation protocol for use with the Resource Public Key Infrastructure (RPKI) <xref target="RFC6480"/>.
+        The ERIK protocol can be characterized as data replication scheme using a content-addressable naming system <xref target="RFC6920"/> with timestamp-based concurrency control <xref target="RFC0677"/> transported over HTTP <xref target="RFC9110"/>.
+        Relying Parties can combine information retrieved via ERIK with other RPKI transport protocols (<xref target="RFC5781"/> and <xref target="RFC8182"/>).
+        The protocol's design is intended to be efficient, fast, and easy to implement <xref target="RFC1925"/>.
+      </t>
+
+      <section anchor="reqs-lang">
+        <name>Requirements Language</name>
+        <t>
+          The key words "<bcp14>MUST</bcp14>", "<bcp14>MUST NOT</bcp14>", "<bcp14>REQUIRED</bcp14>", "<bcp14>SHALL</bcp14>", "<bcp14>SHALL NOT</bcp14>", "<bcp14>SHOULD</bcp14>", "<bcp14>SHOULD NOT</bcp14>", "<bcp14>RECOMMENDED</bcp14>", "<bcp14>NOT RECOMMENDED</bcp14>", "<bcp14>MAY</bcp14>", and "<bcp14>OPTIONAL</bcp14>" in this document are to be interpreted as described in BCP&nbsp;14 <xref target="RFC2119"/> <xref target="RFC8174"/> when, and only when, they appear in all capitals, as shown here.</t>
+      </section>
+
+      <section anchor="Related">
+        <name>Related Work</name>
+        <t>
+          It is assumed that the reader is familiar with the terms and concepts described in
+          "<xref target="RFC6480" format="title"/>" <xref target="RFC6480" format="default"/>,
+          "<xref target="RFC8182" format="title"/>" <xref target="RFC8182" format="default"/>,
+          and "<xref target="RFC9286" format="title"/>" <xref target="RFC9286" format="default"/>.
+        </t>
+      </section>
+
+
+      <section anchor="glossary">
+        <name>Glossary</name>
+        <t>
+          This section describes the terminology and abbreviations used in this document.
+          Though the definitions might not be clear on a first read, later on the terms will be introduce with more detail.
+        </t>
+
+        <dl>
+
+           <dt>FQDN</dt>
+           <dd>The fully qualified domain name of a RPKI repository instance referenced in a certificate's Subject Information Access (SIA) extension.</dd>
+
+           <dt>Hash</dt>
+           <dd>A message digest calculated for an object using the SHA-256 algorithm.</dd>
+
+           <dt>Root hash</dt>
+           <dd>The hash of the current Index associated with a given FQDN.</dd>
+
+           <dt>Index</dt>
+           <dd>A sorted listing of Partition identifiers and associated hashes.</dd>
+
+           <dt>Partition</dt>
+           <dd>A sorted listing of a hashes of Manifest objects, their CMS signing timestamps, and URIs in the accessLocation in the id-ad-signedObject accessMethods in the Manifest's SIA.</dd>
+
+        </dl>
+      </section>
+
+    </section>
+
+    <section anchor="walkthrough">
+      <name>Example Protocol Walkthrough</name>
+      <t>
+        Fetch the root hash for a specific FQDN, in this case <tt>chloe.sobornost.net</tt>:
+      </t>
+
+<artwork>
+<![CDATA[
+$ curl -s https://example.net/chloe.sobornost.net
+sn/Qn/snQnoO1WCltT-0ZQDDMDnbmHza1LbXfvj6jVfyAjevI.idx
+]]>
+</artwork>
+
+      <t>
+        Fetch the Index:
+      </t>
+
+<artwork>
+<![CDATA[
+$ curl https://example.net/sn/Qn/snQnoO1WCltT-0ZQDDMDnbmHza1LbXfvj6jVfyAjevI.idx
+A4 m4/nt/m4ntQBsLtR7bIJs6hBS17W7lhdyc2VaZh1RfHqAu1c0.par
+CA 55/ah/55ahOGzBWb4z5dwLh2d8w38G7eSUv-atdwTSeGpGB3w.par
+]]>
+</artwork>
+
+      <t>
+        Fetch Partition <tt>A4</tt> for <tt>chloe.sobornost.net</tt>.
+      </t>
+
+<artwork>
+<![CDATA[
+$ curl https://example.net/m4/nt/m4ntQBsLtR7bIJs6hBS17W7lhdyc2VaZh1RfHqAu1c0.par
+pC/We/pCWexo5aHTRHEY33HXaJdlTE0cUlbi2n-d_f0AUoj9w.mft 1746711620 chloe.sobornost.net/rpki/RIPE-nljobsnijders/yqgF26w2R0m5sRVZCrbvD5cM29g.mft
+]]>
+</artwork>
+
+    </section>
+
+    <section anchor="rp">
+      <name>Client Behaviour</name>
+      <t>
+        
+      </t>
+    </section>
+
+    <section anchor="error">
+      <name>Error detection</name>
+      <t>
+        The client MUST calculate the hash of objects that were downloaded and verify it is the same as the hash embedded in the name through which the object was retrieved.
+      </t>
+    </section>
+
+    <section anchor="openquestions">
+      <name>Open Questions</name>
+       <ul>
+         <li>Should inspiration be taken from DNSoverHTTP to signal the URL scheme to clients?</li>
+         <li>Are the filename extensions useful for debugging, or unnecessary bloat?</li>
+         <li>Is it helpful to have a sharding scheme embedded in the hash-based filenames?</li>
+         <li>In Partitions, should a hash of the Manifest SIA be used instead of the bare SIA?</li>
+         <li>Should Partitions list the filesize of the referenced Manifests? If the filesizes are known they could be used as offsets in 'bundles' of objects to facilitate bulk downloads / HTTP range requests.</li>
+       </ul>
+    </section>
+
+    <section anchor="operational">
+      <name>Operational Considerations</name>
+      <t>
+        This document ...
+      </t>
+    </section>
+
+    <section anchor="security">
+      <name>Security Considerations</name>
+      <t>
+         ...
+      </t>
+    </section>
+
+    <section anchor="iana">
+      <name>IANA Considerations</name>
+      <t>
+        This document has no IANA actions.
+      </t>
+    </section>
+
+  </middle>
+
+  <back>
+    <references>
+      <name>References</name>
+      <references>
+        <name>Normative References</name>
+
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.9286.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.9110.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.6920.xml"/>
+
+      </references>
+
+      <references>
+        <name>Informative References</name>
+
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.0677.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1925.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.5781.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.6480.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8182.xml"/>
+
+<!--
+ later ...
+        <reference anchor="rpki-client" target="https://www.rpki-client.org/">
+          <front>
+            <title>rpki-client</title>
+            <author fullname="Claudio Jeker"/>
+            <author fullname="Job Snijders"/>
+            <author fullname="Kristaps Dzonsons"/>
+            <author fullname="Theo Buehler"/>
+            <date month="June" year="2024" />
+          </front>
+        </reference>
+
+-->
+
+      </references>
+    </references>
+
+    <section title="Implementation status - RFC EDITOR: REMOVE BEFORE PUBLICATION">
+      <t>
+        This section records the status of known implementations of the protocol defined by this specification at the time of posting of this Internet-Draft, and is based on a proposal described in RFC 7942.
+        The description of implementations in this section is intended to assist the IETF in its decision processes in progressing drafts to RFCs.
+        Please note that the listing of any individual implementation here does not imply endorsement by the IETF.
+        Furthermore, no effort has been spent to verify the information presented here that was supplied by IETF contributors.
+        This is not intended as, and must not be construed to be, a catalog of available implementations or their features.
+        Readers are advised to note that other implementations may exist.
+      </t>
+
+      <t>
+        According to RFC 7942, "this will allow reviewers and working groups to assign due consideration to documents that have the benefit of running code, which may serve as evidence of valuable experimentation and feedback that have made the implemented protocols more mature.
+        It is up to the individual working groups to use this information as they see fit".
+      </t>
+      <t>
+          An experimental ERIK server is available here: https://nyc1.digitalocean.rpkiviews.org/rpki/{FQDN}
+      </t>
+    </section>
+
+    <section anchor="acknowledgements" numbered="false">
+      <name>Acknowledgements</name>
+      <t>
+        The authors wish to thank
+          <contact fullname="George Michaelson"/>,
+          <contact fullname="Theo de Raadt"/>,
+          <contact fullname="Bob Beck"/>, and
+          <contact fullname="Theo Buehler"/>
+        for lovely conversations that led to this proposal.
+      </t>
+      <t>
+        This protocol is named after Erik Bais, who passed away in 2024, as a small token of appreciation for his friendship.
+      </t>
+    </section>
+  </back>
+</rfc>
