@@ -192,7 +192,7 @@ pC/We/pCWexo5aHTRHEY33HXaJdlTE0cUlbi2n-d_f0AUoj9w.mft 1746711620 chloe.sobornost
       </t>
     </section>
 
-    <section anchor="openquestions">
+    <section anchor="openquestions" removeInRFC="true">
       <name>Open Questions</name>
        <ul>
          <li>Should inspiration be taken from DNSoverHTTP to signal the URL scheme to clients?</li>
@@ -267,7 +267,7 @@ pC/We/pCWexo5aHTRHEY33HXaJdlTE0cUlbi2n-d_f0AUoj9w.mft 1746711620 chloe.sobornost
       </references>
     </references>
 
-    <section title="Implementation status - RFC EDITOR: REMOVE BEFORE PUBLICATION">
+    <section title="Implementation status" removeInRFC="true">
       <t>
         This section records the status of known implementations of the protocol defined by this specification at the time of posting of this Internet-Draft, and is based on a proposal described in RFC 7942.
         The description of implementations in this section is intended to assist the IETF in its decision processes in progressing drafts to RFCs.
