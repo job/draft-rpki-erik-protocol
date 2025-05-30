@@ -65,7 +65,7 @@ version="3">
 
     <abstract>
       <t>
-        This document specifies Erik, a synchronisation protocol for use with the Resource Public Key Infrastructure (RPKI).
+        This document specifies the Erik protocol, a synchronisation protocol for use with the Resource Public Key Infrastructure (RPKI).
         The Erik protocol can be characterized as data replication scheme using a content-addressable naming system with timestamp-based concurrency control transported over HTTP.
         Relying Parties can combine information retrieved via Erik with other RPKI transport protocols.
         The protocol's design is intended to be efficient, fast, and easy to implement.
