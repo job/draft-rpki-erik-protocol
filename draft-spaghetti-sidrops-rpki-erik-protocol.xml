@@ -287,7 +287,7 @@ pC/We/pCWexo5aHTRHEY33HXaJdlTE0cUlbi2n-d_f0AUoj9w.mft 1746711620 chloe.sobornost
         It is up to the individual working groups to use this information as they see fit".
       </t>
       <t>
-          An experimental Erik server is available here: https://nyc1.digitalocean.rpkiviews.org/rpki/{FQDN}
+          An experimental ESP server is available here: https://nyc1.digitalocean.rpkiviews.org/rpki/{FQDN}
       </t>
     </section>
 
