@@ -21,8 +21,8 @@ version="3">
 
   <front>
 
-    <title abbrev="Erik Synchronisation Protocol for RPKI">
-      The Erik Synchronisation Protocol for use with the Resource Public Key Infrastructure (RPKI)
+    <title abbrev="Erik Synchronization Protocol for RPKI">
+      The Erik Synchronization Protocol for use with the Resource Public Key Infrastructure (RPKI)
     </title>
 
     <author fullname="Job Snijders" initials="J." surname="Snijders">
@@ -61,13 +61,13 @@ version="3">
    <area>Operations and Management Area (OPS)</area>
    <workgroup>SIDROPS</workgroup>
 
-   <keyword>Data synchronisation</keyword>
+   <keyword>Data synchronization</keyword>
 
     <abstract>
       <t>
-        This document specifies the Erik protocol, a synchronisation protocol for use with the Resource Public Key Infrastructure (RPKI).
-        The Erik protocol can be characterized as data replication scheme using a content-addressable naming system with timestamp-based concurrency control transported over HTTP.
-        Relying Parties can combine information retrieved via Erik with other RPKI transport protocols.
+        This document specifies the Erik Synchronization Protocol (ESP) for use with the Resource Public Key Infrastructure (RPKI).
+        ESP can be characterized as data replication scheme using a content-addressable naming system with timestamp-based concurrency control transported over HTTP.
+        Relying Parties can combine information retrieved via ESP with other RPKI transport protocols.
         The protocol's design is intended to be efficient, fast, and easy to implement.
       </t>
     </abstract>
@@ -79,9 +79,9 @@ version="3">
     <section anchor="intro">
       <name>Introduction</name>
       <t>
-        This document specifies Erik, a synchronisation protocol for use with the Resource Public Key Infrastructure (RPKI) <xref target="RFC6480"/>.
-        The Erik protocol can be characterized as data replication scheme using a content-addressable naming system <xref target="RFC6920"/> with timestamp-based concurrency control <xref target="RFC0677"/> transported over HTTP <xref target="RFC9110"/>.
-        Relying Parties can combine information retrieved via Erik with other RPKI transport protocols (<xref target="RFC5781"/> and <xref target="RFC8182"/>).
+        This document specifies the Erik Synchronization Protocol (ESP) for use with the Resource Public Key Infrastructure (RPKI) <xref target="RFC6480"/>.
+        ESP can be characterized as data replication scheme using a content-addressable naming system <xref target="RFC6920"/> with timestamp-based concurrency control <xref target="RFC0677"/> transported over HTTP <xref target="RFC9110"/>.
+        Relying Parties can combine information retrieved via ESP with other RPKI transport protocols (<xref target="RFC5781"/> and <xref target="RFC8182"/>).
         The protocol's design is intended to be efficient, fast, and easy to implement <xref target="RFC1925"/>.
       </t>
 
