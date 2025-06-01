@@ -66,7 +66,7 @@ version="3">
     <abstract>
       <t>
         This document specifies the Erik Synchronization Protocol for use with the Resource Public Key Infrastructure (RPKI).
-        Erik Synchronization can be characterized as a data replication scheme using a content-addressable naming system with timestamp-based concurrency control transported over HTTP.
+        Erik Synchronization can be characterized as a data replication system using merkle trees, a content-addressable naming scheme, timestamp-based concurrency control, and HTTP transport.
         Relying Parties can combine information retrieved via Erik Synchronization with other RPKI transport protocols.
         The protocol's design is intended to be efficient, fast, and easy to implement.
       </t>
@@ -80,7 +80,7 @@ version="3">
       <name>Introduction</name>
       <t>
         This document specifies the Erik Synchronization Protocol for use with the Resource Public Key Infrastructure (RPKI) <xref target="RFC6480"/>.
-        Erik Synchronization can be characterized as a data replication scheme using a content-addressable naming system <xref target="RFC6920"/> with timestamp-based concurrency control <xref target="RFC0677"/> transported over HTTP <xref target="RFC9110"/>.
+        Erik Synchronization can be characterized as a data replication system using Merkle Trees <xref target="M1987"/>, a content-addressable naming scheme <xref target="RFC6920"/>, timestamp-based concurrency control <xref target="RFC0677"/>, and HTTP transport <xref target="RFC9110"/>.
         Relying Parties can combine information retrieved via Erik Synchronization with other RPKI transport protocols (<xref target="RFC5781"/> and <xref target="RFC8182"/>).
         The protocol's design is intended to be efficient, fast, and easy to implement <xref target="RFC1925"/>.
       </t>
@@ -247,6 +247,17 @@ pC/We/pCWexo5aHTRHEY33HXaJdlTE0cUlbi2n-d_f0AUoj9w.mft 1746711620 chloe.sobornost
 
       <references>
         <name>Informative References</name>
+
+        <reference anchor="M1987" quoteTitle="true" target="https://doi.org/10.1007/3-540-48184-2_32" derivedAnchor="M1987">
+          <front>
+            <title>A Digital Signature Based on a Conventional Encryption Function</title>
+            <author fullname="R. Merkle" initials="R." surname="Merkle"/>
+            <date year="1988"/>
+          </front>
+          <refcontent>Advances in Cryptology -- CRYPTO '87 Proceedings</refcontent>
+          <refcontent>Lecture Notes in Computer Science, Vol. 293</refcontent>
+          <seriesInfo name="DOI" value="10.1007/3-540-48184-2_32"/>
+        </reference>
 
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.0677.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1925.xml"/>
