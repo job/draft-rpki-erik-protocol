@@ -56,6 +56,16 @@ version="3">
       </address>
     </author>
 
+    <author fullname="Wataru" initials="W." surname="Ohgai">
+      <organization>JPNIC</organization>
+      <address>
+        <postal>
+          <country>JP</country>
+        </postal>
+        <email>alt@nic.ad.jp</email>
+      </address>
+    </author>
+
     <date/>
 
    <area>Operations and Management Area (OPS)</area>
@@ -66,7 +76,7 @@ version="3">
     <abstract>
       <t>
         This document specifies the Erik Synchronization Protocol for use with the Resource Public Key Infrastructure (RPKI).
-        Erik Synchronization can be characterized as a data replication system using merkle trees, a content-addressable naming scheme, timestamp-based concurrency control, and HTTP transport.
+        Erik Synchronization can be characterized as a data replication system using Merkle trees, a content-addressable naming scheme, concurrency control using monotonically increasing sequence numbers, and HTTP transport.
         Relying Parties can combine information retrieved via Erik Synchronization with other RPKI transport protocols.
         The protocol's design is intended to be efficient, fast, and easy to implement.
       </t>
@@ -80,7 +90,7 @@ version="3">
       <name>Introduction</name>
       <t>
         This document specifies the Erik Synchronization Protocol for use with the Resource Public Key Infrastructure (RPKI) <xref target="RFC6480"/>.
-        Erik Synchronization can be characterized as a data replication system using Merkle Trees <xref target="M1987"/>, a content-addressable naming scheme <xref target="RFC6920"/>, timestamp-based concurrency control <xref target="RFC0677"/>, and HTTP transport <xref target="RFC9110"/>.
+        Erik Synchronization can be characterized as a data replication system using Merkle Trees <xref target="M1987"/>, a content-addressable naming scheme <xref target="RFC6920"/>, concurrency control using monotonically increasing sequence numbers <xref target="RFC0677"/>, and HTTP transport <xref target="RFC9110"/>.
         Relying Parties can combine information retrieved via Erik Synchronization with other RPKI transport protocols (<xref target="RFC5781"/> and <xref target="RFC8182"/>).
         The protocol's design is intended to be efficient, fast, and easy to implement <xref target="RFC1925"/>.
       </t>
@@ -124,52 +134,267 @@ version="3">
            <dd>A sorted listing of Partition identifiers and associated hashes.</dd>
 
            <dt>Partition</dt>
-           <dd>A sorted listing of a hashes of Manifest objects, their CMS signing timestamps, and URIs in the accessLocation in the id-ad-signedObject accessMethods in the Manifest's SIA.</dd>
+           <dd>A sorted listing of the hashes of Manifest objects, their respective manifestNumbers, and an instance of their SIA's id-ad-signedObject accessDescription.</dd>
+
+           <dt>Snapshot</dt>
+           <dd>A tar archive containing all current and valid CRLs &amp; Manifests for a given FQDN.</dd>
 
         </dl>
       </section>
 
     </section>
 
+    <section anchor="asn1">
+      <name>File Formats</name>
+      <t>
+      </t>
+      <section anchor="asn1-index">
+        <name>ASN.1 Definition for Index objects</name>
+        <t>
+          An Erik Index represents a the full state of all currently valid Manifest objects available under a given FQDN.
+        </t>
+<sourcecode type="asn.1" markers="false">
+<![CDATA[
+RpkiErikIndex-2025
+  { iso(1) member-body(2) us(840) rsadsi(113549)
+    pkcs(1) pkcs9(9) smime(16) mod(0)
+    id-mod-rpkiErikIndex-2025(TBD) }
+
+DEFINITIONS EXPLICIT TAGS ::=
+BEGIN
+
+IMPORTS
+  Digest, DigestAlgorithmIdentifier
+  FROM CryptographicMessageSyntax-2010 -- in [RFC6268]
+  { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+    pkcs-9(9) smime(16) modules(0) id-mod-cms-2009(58) }
+
+ErikIndex ::= SEQUENCE {
+  version [0]           INTEGER DEFAULT 0,
+  indexScope            IA5String (1..1000),
+  indexNumber           INTEGER (0..MAX) OPTIONAL,
+  indexTime             GeneralizedTime,
+  hashAlg               DigestAlgorithmIdentifier,
+  previousIndex         Digest OPTIONAL,
+  partitionList         SEQUENCE SIZE (1..ub-Partitions) OF PartitionListEntry }
+
+ub-Partitions INTEGER ::= 1024
+
+PartitionListEntry ::= SEQUENCE {
+  partitionIdentifier   INTEGER (1..ub-Partitions),
+  hash                  Digest }
+END]]>
+</sourcecode>
+
+        <section title="The version field">
+          <t>
+            The version number of the RpkiErikIndex object <bcp14>MUST</bcp14> be 0.
+          </t>
+        </section>
+
+        <section title="The indexScope field">
+          <t>
+            The <tt>indexScope</tt> field contains the fully qualified domain name of the Signed Object location of the Manifests referenced through this particular Index.
+            The FQDN MUST be in the "preferred name syntax", as specified by <xref target="RFC1034" section="3.5"/> and modified by <xref target="RFC1123" section="2.1"/>.
+          </t>
+        </section>
+
+        <section title="The indexNumber field">
+          <t>
+            The <tt>indexNumber</tt> field must increment by one whenever a new <tt>ErikIndex</tt> is produced.
+            This field allows clients to detect gaps in a sequence of published Indexes.
+          </t>
+        </section>
+
+        <section title="The indexTime field">
+          <t>
+            The <tt>indexTime</tt> is the moment the ErikIndex was generated.
+            For the purposes of this profile, <tt>GeneralizedTime</tt> values MUST be expressed UTC (Zulu) and MUST include seconds (i.e., times are YYYYMMDDHHMMSSZ), even where the number of seconds is zero.
+            GeneralizedTime values MUST NOT include fractional seconds.
+            See <xref target="RFC5280" section="4.1.2.5.2"/>.
+          </t>
+        </section>
+
+        <section title="The hashAlg field">
+          <t>
+            This field contains the OID of the hash algorithm used to hash the Partitions.
+            The hash algorithm used MUST conform to the RPKI Algorithms and Key Size Profile specification <xref target="RFC7935"/>.
+          </t>
+        </section>
+
+        <section title="The partitionList field">
+          <t>
+            This field is a sequence of <tt>ErikIndexEntry</tt> instances.
+            There is one <tt>ErikIndexEntry</tt> for each current partition.
+            Each <tt>ErikIndexEntry</tt>is a pair consisting of the partition identifier and the hash of the partition object.
+          </t>
+          <t>
+            Information elements are unique with respect to one another and sorted in ascending order of the partition identifier.
+          </t>
+        </section>
+
+      </section>
+
+      <section anchor="asn1-partition">
+        <name>ASN.1 Definition for Partition Objects</name>
+        <t>
+          An Erik Partition represents a subset of Manifest objects available under a given FQDN.
+        </t>
+
+<sourcecode type="asn.1" markers="false">
+<![CDATA[
+RpkiErikPartition-2025
+  { iso(1) member-body(2) us(840) rsadsi(113549)
+    pkcs(1) pkcs9(9) smime(16) mod(0)
+    id-mod-rpkiErikPartition-2025(TBD) }
+
+DEFINITIONS EXPLICIT TAGS ::=
+BEGIN
+
+IMPORTS
+  SubjectInfoAccessSyntax
+  FROM PKIX1Explicit88 -- in [RFC5280]
+  { iso(1) identified-organization(3) dod(6) internet(1)
+  security(5) mechanisms(5) pkix(7) id-mod(0) id-pkix1-implicit(19) }
+
+  Digest, DigestAlgorithmIdentifier
+  FROM CryptographicMessageSyntax-2010 -- in [RFC6268]
+  { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+    pkcs-9(9) smime(16) modules(0) id-mod-cms-2009(58) }
+
+ErikPartition ::= SEQUENCE {
+  version [0]           INTEGER DEFAULT 0,
+  partitionTime         GeneralizedTime,
+  hashAlg               DigestAlgorithmIdentifier,
+  manifestList          SEQUENCE SIZE (1..MAX) OF ManifestListEntry }
+
+ManifestListEntry ::= SEQUENCE {
+  hash                  Digest,
+  manifestNumber        INTEGER (0..MAX),
+  location              OCTET STRING } -- subjectInfoAccess extnValue
+
+END]]>
+</sourcecode>
+
+        <section title="The version field">
+          <t>
+            The version number of the ErikPartition object <bcp14>MUST</bcp14> be 0.
+          </t>
+        </section>
+
+        <section title="The partitionTime field">
+          <t>
+            The <tt>partitionTime</tt> is the moment the ErikPartition was generated.
+            For the purposes of this profile, <tt>GeneralizedTime</tt> values MUST be expressed UTC (Zulu) and MUST include seconds (i.e., times are YYYYMMDDHHMMSSZ), even where the number of seconds is zero.
+            GeneralizedTime values MUST NOT include fractional seconds.
+            See <xref target="RFC5280" section="4.1.2.5.2"/>.
+          </t>
+        </section>
+
+        <section title="The hashAlg field">
+          <t>
+            This field contains the OID of the hash algorithm used to hash the Manifest objects referenced in this Partition.
+            The hash algorithm used MUST conform to the RPKI Algorithms and Key Size Profile specification <xref target="RFC7935"/>.
+          </t>
+        </section>
+
+        <section title="The manifestList field">
+          <t>
+            This field is a sequence of <tt>ManifestListEntry</tt> instances.
+            There is one <tt>ManifestListEntry</tt> for each current and valid Manifest.
+          </t>
+          <t>
+            A <tt>ManifestListEntry</tt> is a 3-tuple consisting of the hash of the Manifest object, the manifestNumber contained within the object, and an OCTET STRING containing the Manifest's End-Entity certificate's Subject Information Access extension value.
+          </t>
+          <t>
+            Information elements are unique with respect to one another and sorted in ascending order of the hash.
+          </t>
+        </section>
+
+      </section>
+    </section>
+
+    <section anchor="snapshots">
+      <name>Snapshots</name>
+      <t>
+        A Snapshot contains all CRLs and Manifests associated with a given FQDN.
+      </t>
+
+      <!-- reason to use Tar: 'streamable', widely available, and is open standard. -->
+      <t>
+        Snapshots are encoded using the <xref target="ustar" /> format.
+      </t>
+
+    </section>
+
     <section anchor="walkthrough">
       <name>Example Protocol Walkthrough</name>
       <t>
-        Fetch the root hash for a specific FQDN, in this case <tt>chloe.sobornost.net</tt>:
+        Merkle trees are used to determine whether differences exist between client and relay.
+        Timestamps are used to determine whether those differences are of interest for the client to fetch.
+        Everything is fetched using addresses derived from hashes, except hash tree heads.
+      </t>
+
+      <t>
+        The client starts by fetching the root hash for a specific FQDN, in this example <tt>rpki-repository.nic.ad.jp</tt>:
       </t>
 
 <artwork>
 <![CDATA[
-$ curl -s https://example.net/chloe.sobornost.net
-sn/Qn/snQnoO1WCltT-0ZQDDMDnbmHza1LbXfvj6jVfyAjevI.idx
+$ curl -s https://cache.rpki-client.org/rpki/rpki-repository.nic.ad.jp
+jy/EJ/jyEJ1u1YI9PAUAci8P6UkfxyRIYRmVK_W0y7iiIqY4E.idx
 ]]>
 </artwork>
 
       <t>
-        Fetch the Index:
+        If the tree head changed compared to the previous run, the client then can Fetch the new Index:
       </t>
 
 <artwork>
 <![CDATA[
-$ curl -s https://example.net/sn/Qn/snQnoO1WCltT-0ZQDDMDnbmHza1LbXfvj6jVfyAjevI.idx
-A4 m4/nt/m4ntQBsLtR7bIJs6hBS17W7lhdyc2VaZh1RfHqAu1c0.par
-CA 55/ah/55ahOGzBWb4z5dwLh2d8w38G7eSUv-atdwTSeGpGB3w.par
+$ curl -s https://cache.rpki-client.org/rpki/jy/EJ/jyEJ1u1YI9PAUAci8P6UkfxyRIYRmVK_W0y7iiIqY4E.idx
+00 vl/Y8/vlY8qoYP3OPzWzr7fHAXW2Tvctv6bt-_EiR9OeIbbLg.par
+01 Uo/Mb/UoMbP7LL2ANaW4gDvlToYzUilRb5gNOc3W7Ui1vc0ps.par
+02 E3/rA/E3rAGqexLt5qXjSNBcA2X85XIz2eGsZjYOluGJPYN78.par
+...
 ]]>
 </artwork>
 
       <t>
-        Fetch Partition <tt>A4</tt> for <tt>chloe.sobornost.net</tt>.
+        Then fetch any changed Partitions, for example the Partition with identifier <tt>02</tt>:
       </t>
 
 <artwork>
 <![CDATA[
-$ curl -s https://example.net/m4/nt/m4ntQBsLtR7bIJs6hBS17W7lhdyc2VaZh1RfHqAu1c0.par
-pC/We/pCWexo5aHTRHEY33HXaJdlTE0cUlbi2n-d_f0AUoj9w.mft 1746711620 chloe.sobornost.net/rpki/RIPE-nljobsnijders/yqgF26w2R0m5sRVZCrbvD5cM29g.mft
+$ curl -s https://cache.rpki-client.org/rpki/E3/rA/E3rAGqexLt5qXjSNBcA2X85XIz2eGsZjYOluGJPYN78.par
+Aq/bc/AqbclsBe44NT4pXD0WIV3UeJDF5rbeZfIQIK5LFF1JU.mft 1750488344 rpki-repository.nic.ad.jp/ap/A91A73810000/783/y4MAsgZZu5UQYPYLH0vGCRrydjk.mft
+Ar/ch/ArchYTepahZvtPVVOsVgIT-4EyCEe8cLmDx1utyKNN0.mft 1750488520 rpki-repository.nic.ad.jp/ap/A91A73810000/5309/UPSfllzdpPiLgWFvMH4W19yItLg.mft
+At/1H/At1HS8tipX8EFHtaKb7016mr09x1u9B13YvoEdpi_yE.mft 1750489319 rpki-repository.nic.ad.jp/ap/A91A73810000/0030113/8nBk_-QpNs2_WeUUZeAj-uS1r6o.mft
 ]]>
 </artwork>
 
       <t>
         Column 1 is the hash of the Manifest object, Column 2 is the timestamp as seconds from the unix epoch, Column 3 is the Manifest's SignedObject SIA.
+        The client now can compare the manifestNumber sequence number for each Manifest offered in a Partition, and choose to download a (purportedly) newer version of a given Manifest:
       </t>
+
+<artwork>
+<![CDATA[
+$ cd staging/rpki-repository.nic.ad.jp/ap/A91A73810000/0030113/
+$ curl -o 8nBk_-QpNs2_WeUUZeAj-uS1r6o.mft https://cache.rpki-client.org/rpki/At/1H/At1HS8tipX8EFHtaKb7016mr09x1u9B13YvoEdpi_yE.mft
+]]>
+</artwork>
+
+      <t>
+        The client now has sufficient information to proceed to download any missing Certificates, Signed objects, and CRLs.
+        Based on the information contained within the Manifest(s), the client can fetch addressed by content, and store by name, like so:
+      </t>
+
+<artwork>
+<![CDATA[
+$ curl -o 8nBk_-QpNs2_WeUUZeAj-uS1r6o.crl https://cache.rpki-client.org/rpki/MZ/6q/MZ6qjT947bJy9G2ONDUE+icDrSXyck3N9BFM5AijTYM.crl
+]]>
+</artwork>
 
     </section>
 
@@ -179,13 +404,14 @@ pC/We/pCWexo5aHTRHEY33HXaJdlTE0cUlbi2n-d_f0AUoj9w.mft 1746711620 chloe.sobornost
         A client can decide whether or not to download Index and Partition objects, by comparing the hash to previous fetches.
       </t>
       <t>
-        A client can decide whether or not to download a Manifest object, by comparing the signing timestamp with what's locally cached and available.
+        A client can decide whether or not to fetch a given Manifest object, by comparing the <tt>manifestNumber</tt> with what's locally cached and what's offered by the remote relay.
       </t>
       <t>
-        A client can decide whether or not to download a Manifest object, by comparing the signing timestamp contained in the Partition with most recent locally cached Manifest.
+        A client can compute which products listed in the Manifest's fileList need to be downloaded from the relay.
       </t>
       <t>
-        A client can compute which products listed in the Manifest's fileList need to be downloaded from the server.
+        As there is no concept of 'sessions' (like in RRDP), clients can interchangably use different Erik relay.
+        When one Erik relay generates a HTTP error, the client can try fetching the requested object from another Erik relay.
       </t>
     </section>
 
@@ -196,15 +422,65 @@ pC/We/pCWexo5aHTRHEY33HXaJdlTE0cUlbi2n-d_f0AUoj9w.mft 1746711620 chloe.sobornost
       </t>
     </section>
 
+    <section anchor="relay">
+      <name>Setting up an Erik Relay</name>
+      <t>
+        The Erik protocol is an opportunistic cache-to-cache replication protocol using timestamp-based concurrency control.
+        The relay generates Indexes and Partitions derived from its current validation state, the client then cherry-picks which objects (if any) it wishes to fetch.
+      </t>
+      <t>
+        The relay operator must decide on a "manifest-to-partition" assignment scheme.
+        The proof-of-concept relay (see <xref target="running_code"/>) uses the first few octets of the SHA-256 hash of the Manifest for produce as a stable assignment strategy.
+        Other strategies could be to assign Manifests to Partitions based on the "hour-of-day" of the CMS signing timestamp.
+        Tuning such parameters does not require changes to the on-the-wire format of this protocol.
+      </t>
+    </section>
+
+    <section anchor="comparison">
+      <name>Comparison with other RPKI transport protocols</name>
+
+      <t>
+        Ignoring obvious "on the wire format" differences between Erik, Rsync, and RRDP; there are a number of key design differences between the protocols.
+        Rsync and RRDP can be described as "general purpose" synchronisation protocols, while the Erik protocol design is RPKI-specific.
+        In the Erik protocol, Manifest objects (which RPs require for validation anyway) are an integral part of the signaling layer.
+      </t>
+
+      <section>
+        <name>Rsync</name>
+        <t>
+          In Rsync, the server and the client construct and transfer a full listing of all available objects, and then transfer objects as necessary.
+          In effect, this allows clients to 'jump' to the latest repository state, regardless of the state of the local cache.
+        </t>
+        <t>
+          A major downside of Rsync is that the list of files itself can become a burden to transfer.
+          As of June 2025, in order to merely establish whether a client is synchronized or not with the RIPE NCC repository at <tt>rpki.ripe.net</tt>, as much as 5.8 megabytes of data are exchanged without exchanging any RPKI data.
+        </t>
+        <t>
+          When synchronizing once an hour, Rsync generally consumes less network traffic than RRDP.
+        </t>
+      </section>
+
+      <section>
+        <name>RRDP</name>
+        <t>
+          The key concept in RRDP is that the client downloads a "journal", containing all add/update/delete operations and replays this journal to arrive at the current repository state.
+        </t>
+        <t>
+          A major downside of RRDP is that (depending on the RRDP polling interval) clients end up downloading data which has become outdated.
+          Imagine a hypothetical CA which issues and revokes a ROA every 10 minutes, and a client that synchronizes every 60 minutes; this client in effect must download 5 outdated states, wasting bandwidth.
+        </t>
+        <t>
+          When synchronizing every 15 minutes, RRDP generally consumes less network traffic than Rsync.
+        </t>
+      </section>
+
+    </section>
+
     <section anchor="openquestions" removeInRFC="true">
       <name>Open Questions</name>
        <ul>
-         <li>Should inspiration be taken from DNSoverHTTP to signal the URL scheme to clients?</li>
-         <li>Are the filename extensions useful for debugging, or unnecessary bloat?</li>
-         <li>Is it helpful to have a sharding scheme embedded in the hash-based filenames?</li>
-         <li>In Partitions, should a hash of the Manifest SIA be used instead of the bare SIA?</li>
+         <li>Should the hash tree heads contain a <tt>previous hash</tt> field so clients can observe gaps in chains?</li>
          <li>Should Partitions list the filesize of the referenced Manifests? If the filesizes are known they could be used as offsets in 'bundles' of objects to facilitate bulk downloads / HTTP range requests.</li>
-         <li>Should a binary format be used instead of text files with column?</li>
        </ul>
     </section>
 
@@ -238,10 +514,14 @@ pC/We/pCWexo5aHTRHEY33HXaJdlTE0cUlbi2n-d_f0AUoj9w.mft 1746711620 chloe.sobornost
         <name>Normative References</name>
 
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
-        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml"/>
-        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.9286.xml"/>
-        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.9110.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.5280.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.6920.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.7935.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.9110.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.9286.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1034.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1123.xml"/>
 
       </references>
 
@@ -257,6 +537,18 @@ pC/We/pCWexo5aHTRHEY33HXaJdlTE0cUlbi2n-d_f0AUoj9w.mft 1746711620 chloe.sobornost
           <refcontent>Advances in Cryptology -- CRYPTO '87 Proceedings</refcontent>
           <refcontent>Lecture Notes in Computer Science, Vol. 293</refcontent>
           <seriesInfo name="DOI" value="10.1007/3-540-48184-2_32"/>
+        </reference>
+
+        <reference anchor="ustar" target="https://pubs.opengroup.org/onlinepubs/9799919799/utilities/pax.html#tag_20_94_13_06">
+          <front>
+            <title>ustar Interchange Format</title>
+            <author>
+              <organization>IEEE/Open Group</organization>
+            </author>
+            <date year="2024" month="June"/>
+          </front>
+          <seriesInfo name="IEEE Std" value="1003.1-2024"/>
+          <seriesInfo name="DOI" value="10.1109/IEEESTD.2018.8423794"/>
         </reference>
 
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.0677.xml"/>
@@ -283,7 +575,7 @@ pC/We/pCWexo5aHTRHEY33HXaJdlTE0cUlbi2n-d_f0AUoj9w.mft 1746711620 chloe.sobornost
       </references>
     </references>
 
-    <section title="Implementation status" removeInRFC="true">
+    <section anchor="running_code" title="Implementation status" removeInRFC="true">
       <t>
         This section records the status of known implementations of the protocol defined by this specification at the time of posting of this Internet-Draft, and is based on a proposal described in RFC 7942.
         The description of implementations in this section is intended to assist the IETF in its decision processes in progressing drafts to RFCs.
@@ -298,7 +590,10 @@ pC/We/pCWexo5aHTRHEY33HXaJdlTE0cUlbi2n-d_f0AUoj9w.mft 1746711620 chloe.sobornost
         It is up to the individual working groups to use this information as they see fit".
       </t>
       <t>
-          An experimental ESP server is available here: https://nyc1.digitalocean.rpkiviews.org/rpki/{FQDN}
+        An experimental Erik relay is available here: <tt>https://cache.rpki-client.org/rpki/{FQDN}</tt>.
+      </t>
+      <t>
+        An experimental Erik client was developed by Job Snijders using <tt>ksh</tt>, <tt>C</tt>, and <tt>Python</tt>.
       </t>
     </section>
 
