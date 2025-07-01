@@ -172,7 +172,6 @@ IMPORTS
 ErikIndex ::= SEQUENCE {
   version [0]           INTEGER DEFAULT 0,
   indexScope            IA5String (1..1000),
-  indexNumber           INTEGER (0..MAX) OPTIONAL,
   indexTime             GeneralizedTime,
   hashAlg               DigestAlgorithmIdentifier,
   previousIndex         Digest OPTIONAL,
@@ -196,13 +195,6 @@ END]]>
           <t>
             The <tt>indexScope</tt> field contains the fully qualified domain name of the Signed Object location of the Manifests referenced through this particular Index.
             The FQDN MUST be in the "preferred name syntax", as specified by <xref target="RFC1034" section="3.5"/> and modified by <xref target="RFC1123" section="2.1"/>.
-          </t>
-        </section>
-
-        <section title="The indexNumber field">
-          <t>
-            The <tt>indexNumber</tt> field must increment by one whenever a new <tt>ErikIndex</tt> is produced.
-            This field allows clients to detect gaps in a sequence of published Indexes.
           </t>
         </section>
 
