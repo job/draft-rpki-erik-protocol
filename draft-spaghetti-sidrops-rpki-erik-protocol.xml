@@ -333,8 +333,11 @@ END]]>
       </t>
 
       <t>
-        Snapshots are encoded using the <xref target="ustar" /> format.
-        The reason to use Tar: it is 'streamable', widely available, and is open standard.
+        Snapshots are encoded using the <xref target="ustar" /> format and compressed using GZIP <xref target="RFC1952"/>.
+      </t>
+      <t>
+        The ustar format was selected because it is 'streamable', widely available, and an open standard.
+        GZIP compression is mandated because opportunistic compression in the transport layer (e.g. HTTP compressed content-encoding) is not universally available.
       </t>
     </section>
 -->
