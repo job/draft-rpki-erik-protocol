@@ -122,7 +122,7 @@ version="3">
         <dl>
 
            <dt>FQDN</dt>
-           <dd>The fully qualified domain name of a RPKI repository instance referenced in a certificate's Subject Information Access (SIA) extension.</dd>
+           <dd>The fully qualified domain name of a RPKI repository instance referenced in an end-entity certificate's Subject Information Access (SIA) extension's id-ad-signedObject accessDescription.</dd>
 
            <dt>Hash</dt>
            <dd>A message digest calculated for an object using the SHA-256 algorithm.</dd>
@@ -134,7 +134,7 @@ version="3">
            <dd>A sorted listing of Partition identifiers and associated hashes.</dd>
 
            <dt>Partition</dt>
-           <dd>A sorted listing of the hashes of Manifest objects, their respective manifestNumbers, and an instance of their SIA's id-ad-signedObject accessDescription.</dd>
+           <dd>A sorted listing of the Manifest objects' hashes, manifestNumbers, and their certificates' SIA extension values.</dd>
 
 <!--
            <dt>Snapshot</dt>
@@ -243,6 +243,7 @@ END]]>
         <name>ASN.1 Definition for Partition Objects</name>
         <t>
           An Erik Partition represents a subset of Manifest objects available under a given FQDN.
+          Each Partition is a sorted listing of the Manifest objects' hashes, manifestNumbers, and their end-entity certificates' SIA extension values.</dd>
         </t>
 
 <sourcecode type="asn.1" markers="false">
