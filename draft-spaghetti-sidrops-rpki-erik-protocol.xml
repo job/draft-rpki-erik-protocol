@@ -136,8 +136,10 @@ version="3">
            <dt>Partition</dt>
            <dd>A sorted listing of the hashes of Manifest objects, their respective manifestNumbers, and an instance of their SIA's id-ad-signedObject accessDescription.</dd>
 
+<!--
            <dt>Snapshot</dt>
            <dd>A tar archive containing all current and valid CRLs &amp; Manifests for a given FQDN.</dd>
+-->
 
         </dl>
       </section>
@@ -152,6 +154,10 @@ version="3">
         <name>ASN.1 Definition for Index objects</name>
         <t>
           An Erik Index represents a the full state of all currently valid Manifest objects available under a given FQDN.
+        </t>
+        <t>
+          A Manifest is nominally current until the time specified in nextUpdate or until a Manifest is issued with a greater manifestNumber, whichever comes first.
+          See <xref target="RFC9286" section="4.2.1"/> for more information.
         </t>
 <sourcecode type="asn.1" markers="false">
 <![CDATA[
@@ -171,7 +177,7 @@ IMPORTS
 
 ErikIndex ::= SEQUENCE {
   version [0]           INTEGER DEFAULT 0,
-  indexScope            IA5String (1..1000),
+  indexScope            IA5String,
   indexTime             GeneralizedTime,
   hashAlg               DigestAlgorithmIdentifier,
   previousIndex         Digest OPTIONAL,
@@ -200,10 +206,16 @@ END]]>
 
         <section title="The indexTime field">
           <t>
-            The <tt>indexTime</tt> is the moment the ErikIndex was generated.
+            The <tt>indexTime</tt> is the most recent <tt>partitionTime</tt> value among the ErikPartitions referenced from this Index.
+            The field's value roughly indicates when the Index was generated.
+          </t>
+          <t>
             For the purposes of this profile, <tt>GeneralizedTime</tt> values MUST be expressed UTC (Zulu) and MUST include seconds (i.e., times are YYYYMMDDHHMMSSZ), even where the number of seconds is zero.
             GeneralizedTime values MUST NOT include fractional seconds.
             See <xref target="RFC5280" section="4.1.2.5.2"/>.
+          </t>
+          <t>
+            Using the most recent <tt>partitionTime</tt> rather than "now" helps reduce churn.
           </t>
         </section>
 
@@ -276,10 +288,16 @@ END]]>
 
         <section title="The partitionTime field">
           <t>
-            The <tt>partitionTime</tt> is the moment the ErikPartition was generated.
+            The <tt>partitionTime</tt> is the most recent <tt>thisUpdate</tt> value among the Manifests contained within this Partition.
+            The field's value roughly indicates when the ErikPartition was generated.
+          </t>
+          <t>
             For the purposes of this profile, <tt>GeneralizedTime</tt> values MUST be expressed UTC (Zulu) and MUST include seconds (i.e., times are YYYYMMDDHHMMSSZ), even where the number of seconds is zero.
             GeneralizedTime values MUST NOT include fractional seconds.
             See <xref target="RFC5280" section="4.1.2.5.2"/>.
+          </t>
+          <t>
+            Using the most recent Manifest <tt>thisUpdate</tt> value instead of "now" helps reduce churn.
           </t>
         </section>
 
@@ -306,18 +324,19 @@ END]]>
       </section>
     </section>
 
+<!--
     <section anchor="snapshots">
       <name>Snapshots</name>
       <t>
         A Snapshot contains all CRLs and Manifests associated with a given FQDN.
       </t>
 
-      <!-- reason to use Tar: 'streamable', widely available, and is open standard. -->
       <t>
         Snapshots are encoded using the <xref target="ustar" /> format.
+        The reason to use Tar: it is 'streamable', widely available, and is open standard.
       </t>
-
     </section>
+-->
 
     <section anchor="walkthrough">
       <name>Example Protocol Walkthrough</name>
