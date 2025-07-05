@@ -337,7 +337,7 @@ END]]>
       </t>
       <t>
         The ustar format was selected because it is 'streamable', widely available, and an open standard.
-        GZIP compression is mandated because opportunistic compression in the transport layer (e.g. HTTP compressed content-encoding) is not universally available.
+        A compressed form is mandated because opportunistic compression in the transport layer (e.g. HTTP compressed content-encoding) is not universally available.
       </t>
     </section>
 -->
