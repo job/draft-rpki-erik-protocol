@@ -243,7 +243,7 @@ END]]>
         <name>ASN.1 Definition for Partition Objects</name>
         <t>
           An Erik Partition represents a subset of Manifest objects available under a given FQDN.
-          Each Partition is a sorted listing of the Manifest objects' hashes, manifestNumbers, and their end-entity certificates' SIA extension values.</dd>
+          Each Partition is a sorted listing of the Manifest objects' hashes, manifestNumbers, and their end-entity certificates' SIA extension values.
         </t>
 
 <sourcecode type="asn.1" markers="false">
