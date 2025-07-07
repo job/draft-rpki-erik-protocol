@@ -359,7 +359,8 @@ END]]>
       <t>
         Clients can bootstrap initial state by fetching a snapshot.
         A snapshot contains all RPKI objects a relay associated with a given FQDN as of the time of the snapshot's production.
-        Because snapshots are not produced in lockstep with updates to the merkle trees, clients should perform a tree comparison after fetching a snapshot.
+        Snapshots do not contain ErikIndex or ErikPartition objects.
+        Because snapshots are not produced in lockstep with updates to the merkle trees, clients MUST perform a tree comparison after fetching a snapshot.
       </t>
       <t>
         Snapshots are encoded using the <xref target="ustar" /> format and compressed using GZIP <xref target="RFC1952"/>.
