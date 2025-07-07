@@ -365,7 +365,7 @@ END]]>
         Because snapshots are not produced in lockstep with updates to the merkle trees, clients MUST perform a tree comparison after fetching a snapshot.
       </t>
       <t>
-        Snapshots are encoded using the <xref target="ustar" /> format and compressed using GZIP <xref target="RFC1952"/>.
+        Snapshots are encoded using the <xref target="ustar" /> format and compressed using GZIP (<xref target="RFC1951"/>, <xref target="RFC1952"/>).
       </t>
       <t>
         Differences between snapshots will be specified at a later time.
@@ -529,6 +529,7 @@ Decimal  Description                      References
 
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1034.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1123.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1951.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1952.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.5280.xml"/>
