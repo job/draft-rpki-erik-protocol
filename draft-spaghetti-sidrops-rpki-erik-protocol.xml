@@ -365,7 +365,7 @@ END]]>
         Because snapshots are not produced in lockstep with updates to the merkle trees, clients MUST perform a tree comparison after fetching a snapshot.
       </t>
       <t>
-        Snapshots are encoded using the <xref target="ustar" /> format and compressed using GZIP (<xref target="RFC1951"/>, <xref target="RFC1952"/>).
+        Snapshots are encoded using the POSIX <xref target="ustar" /> format and compressed using GZIP (<xref target="RFC1951"/>, <xref target="RFC1952"/>).
       </t>
       <t>
         Differences between snapshots will be specified at a later time.
