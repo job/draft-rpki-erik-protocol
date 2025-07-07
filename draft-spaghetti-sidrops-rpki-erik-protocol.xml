@@ -355,7 +355,7 @@ END]]>
     </section>
 
     <section anchor="snapshots">
-      <name>Snapshots</name>
+      <name>Snapshots and Differentials</name>
       <t>
         Clients can bootstrap initial state by fetching a snapshot.
         A snapshot contains all RPKI objects a relay associated with a given FQDN as of the time of the snapshot's production.
@@ -366,10 +366,14 @@ END]]>
         Snapshots are encoded using the <xref target="ustar" /> format and compressed using GZIP <xref target="RFC1952"/>.
       </t>
       <t>
+        Differences between snapshots will be specified at a later time.
+      </t>
+      <t>
         <em>
           Design notes:
           The ustar format was selected because it is 'streamable', widely available, and an open standard.
           A compressed form is mandated because opportunistic compression in the transport layer (e.g. HTTP compressed content-encoding) is not universally available.
+          On the flip side, <tt>.tar.gz</tt> objects likely wont be produced in a deterministic fashion across different implementations, warranting a choice of some other archive format.
         </em>
       </t>
     </section>
