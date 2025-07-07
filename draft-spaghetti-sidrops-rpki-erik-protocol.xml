@@ -29,8 +29,7 @@ version="3">
       <organization />
       <address>
         <postal>
-         <postalLine>Amsterdam</postalLine>
-         <postalLine>The Netherlands</postalLine>
+          <postalLine>The Netherlands</postalLine>
         </postal>
         <email>job@sobornost.net</email>
       </address>
@@ -40,7 +39,7 @@ version="3">
       <organization>RIPE NCC</organization>
       <address>
         <postal>
-          <country>NL</country>
+          <postalLine>The Netherlands</postalLine>
         </postal>
         <email>tim@ripe.net</email>
       </address>
