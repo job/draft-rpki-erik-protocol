@@ -478,7 +478,7 @@ END]]>
        <ul>
          <li>Should the hash tree heads contain a <tt>previous hash</tt> field so clients can observe gaps in chains?</li>
          <li>Should ErikPartitions also list the filesize of the referenced Manifests? Perhaps there are optimisations possible when the filesizes are communicated to clients?</li>
-         <li>How to deterministically assign objects to ErikPartitions?</li>
+         <li>Which of the possible deterministic manifest-to-partition assignment strategies yield the best results?</li>
        </ul>
     </section>
 
