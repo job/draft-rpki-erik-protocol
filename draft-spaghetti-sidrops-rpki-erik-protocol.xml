@@ -479,13 +479,17 @@ END]]>
          <li>Should the hash tree heads contain a <tt>previous hash</tt> field so clients can observe gaps in chains?</li>
          <li>Should ErikPartitions also list the filesize of the referenced Manifests? Perhaps there are optimisations possible when the filesizes are communicated to clients?</li>
          <li>Which of the possible deterministic manifest-to-partition assignment strategies yield the best results?</li>
+         <li>What is the best archive format for Snapshots? The ustar/gzip combo might not easily yield deterministic results across different implementations.</li>
+         <li>Is the concept of Differentials/Deltas needed in Erik Synchronisation?</li>
        </ul>
     </section>
 
     <section anchor="operational">
       <name>Operational Considerations</name>
       <t>
-        This document ...
+        As of July 2025, the global Internet's RPKI churn rate appears to be 2 new objects per second.
+        An Erik relay serving all the Internet's RPKI cache instances (estimated to be ~5000 as of July 2025) would need to be able to sustain serving a bit over 10,000 HTTP requests per second.
+        This order of magnitude in terms of scaling requirements can easily be handled by a single commodity server.
       </t>
     </section>
 
