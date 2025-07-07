@@ -408,13 +408,16 @@ END]]>
     <section anchor="relay">
       <name>Setting Up an Erik Relay</name>
       <t>
+        Erik relays can be operated by third parties, without permission from or coordination with publication point operators or CAs.
+      </t>
+      <t>
         Relays generate ErikIndexes and ErikPartitions derived from their current validation state, the client then cherry-picks which objects (if any) it wishes to fetch.
         Relays fetch fresh data from other relays or from CA-designated publication points.
       </t>
       <t>
         <em>
           Design notes: a decision must be made a deterministic "manifest-to-partition" assignment scheme.
-          The proof-of-concept relay (see <xref target="running_code"/>) uses the first few octets of the SHA-256 hash of the Manifest for produce as a stable assignment strategy.
+          Job's proof-of-concept relay <!-- (see <xref target="running_code"/>) --> uses the first few octets of the SHA-256 hash of the Manifest for produce as a stable assignment strategy.
           Other strategies could be to assign Manifests to ErikPartitions based on the "hour-of-day" of the CMS signing timestamp or the Authority Key Identifier.
         </em>
       </t>
@@ -594,6 +597,7 @@ Decimal  Description                      References
       </references>
     </references>
 
+<!--
     <section anchor="running_code" title="Implementation status" removeInRFC="true">
       <t>
         This section records the status of known implementations of the protocol defined by this specification at the time of posting of this Internet-Draft, and is based on a proposal described in RFC 7942.
@@ -615,6 +619,7 @@ Decimal  Description                      References
         An experimental Erik client was developed by Job Snijders using <tt>ksh</tt>, <tt>C</tt>, and <tt>Python</tt>.
       </t>
     </section>
+-->
 
     <section anchor="acknowledgements" numbered="false">
       <name>Acknowledgements</name>
