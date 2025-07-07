@@ -482,7 +482,9 @@ END]]>
       <name>Security Considerations</name>
       <t>
         This document makes no changes to RPKI certificate validation procedures.
-        See <xref target="RFC8182" section="5"/>.
+      </t>
+      <t>
+        See <xref target="RFC8182" section="5"/> for applicable security considerations.
       </t>
     </section>
 
