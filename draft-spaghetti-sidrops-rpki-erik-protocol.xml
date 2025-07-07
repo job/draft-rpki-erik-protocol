@@ -406,10 +406,11 @@ END]]>
         Relays fetch fresh data from other relays or from CA-designated publication points.
       </t>
       <t>
-        The relay operator must decide on a "manifest-to-partition" assignment scheme.
-        The proof-of-concept relay (see <xref target="running_code"/>) uses the first few octets of the SHA-256 hash of the Manifest for produce as a stable assignment strategy.
-        Other strategies could be to assign Manifests to ErikPartitions based on the "hour-of-day" of the CMS signing timestamp.
-        Tuning such parameters does not require changes to the on-the-wire format of this protocol.
+        <em>
+          Design notes: a decision must be made a deterministic "manifest-to-partition" assignment scheme.
+          The proof-of-concept relay (see <xref target="running_code"/>) uses the first few octets of the SHA-256 hash of the Manifest for produce as a stable assignment strategy.
+          Other strategies could be to assign Manifests to ErikPartitions based on the "hour-of-day" of the CMS signing timestamp.
+        </em>
       </t>
     </section>
 
@@ -468,6 +469,7 @@ END]]>
        <ul>
          <li>Should the hash tree heads contain a <tt>previous hash</tt> field so clients can observe gaps in chains?</li>
          <li>Should ErikPartitions also list the filesize of the referenced Manifests? Perhaps there are optimisations possible when the filesizes are communicated to clients?</li>
+         <li>How to deterministically assign objects to ErikPartitions?</li>
        </ul>
     </section>
 
