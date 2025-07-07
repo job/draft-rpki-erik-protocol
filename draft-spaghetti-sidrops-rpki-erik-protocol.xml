@@ -490,8 +490,16 @@ END]]>
     <section anchor="iana">
       <name>IANA Considerations</name>
       <t>
-        This document has no IANA actions.
+        The IANA is requested to add an item to the "SMI Security for S/MIME Module Identifier" registry as follows:
       </t>
+      <artwork>
+<![CDATA[
+Decimal  Description                      References
+--------------------------------------------------------------
+    TDB  id-mod-rpkiErikIndex-2025        [this-draft]
+    TDB  id-mod-rpkiErikPartition-2025    [this-draft]
+]]>
+        </artwork>
     </section>
 
   </middle>
