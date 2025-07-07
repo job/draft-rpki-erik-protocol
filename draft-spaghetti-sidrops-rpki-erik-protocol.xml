@@ -103,10 +103,12 @@ version="3">
       <section anchor="Related">
         <name>Related Work</name>
         <t>
-          It is assumed that the reader is familiar with the terms and concepts described in
+          The reader is assumed to be familiar with the terms and concepts described in
+          "<xref target="RFC0677" format="title"/>" <xref target="RFC0677" format="default"/>,
           "<xref target="RFC6480" format="title"/>" <xref target="RFC6480" format="default"/>,
           "<xref target="RFC8182" format="title"/>" <xref target="RFC8182" format="default"/>,
-          and "<xref target="RFC9286" format="title"/>" <xref target="RFC9286" format="default"/>.
+          "<xref target="RFC9286" format="title"/>" <xref target="RFC9286" format="default"/>,
+          and "<xref target="M1987" format="title"/>" <xref target="M1987" format="default"/>.
         </t>
       </section>
 
