@@ -488,7 +488,8 @@ END]]>
       <name>Operational Considerations</name>
       <t>
         As of July 2025, the global Internet's RPKI churn rate appears to be 2 new objects per second.
-        An Erik relay serving all the Internet's RPKI cache instances (estimated to be ~5000 as of July 2025) would need to be able to sustain serving a bit over 10,000 HTTP requests per second.
+        The ecosystem is estimated to be composed of ~ 5000 RPKI cache instances and ~ 50 repository servers.
+        Assuming 10 minute fetching intervals and 150 metdata requests per synchronization run (for exchange of Merkle tree data), an Erik relay serving all the Internet's RPKI cache instances would probably need to be able to sustain serving an average of at least 11,000 HTTP requests per second.
         This order of magnitude in terms of scaling requirements can easily be handled by a single commodity server.
       </t>
     </section>
