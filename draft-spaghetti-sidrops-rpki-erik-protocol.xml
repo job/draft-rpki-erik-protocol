@@ -284,8 +284,8 @@ DEFINITIONS EXPLICIT TAGS ::=
 BEGIN
 
 IMPORTS
-  SubjectInfoAccessSyntax
-  FROM PKIX1Explicit88 -- in [RFC5280]
+  AccessDescription
+  FROM PKIX1Implicit88 -- in [RFC5280]
   { iso(1) identified-organization(3) dod(6) internet(1)
   security(5) mechanisms(5) pkix(7) id-mod(0) id-pkix1-implicit(19) }
 
@@ -303,8 +303,7 @@ ErikPartition ::= SEQUENCE {
 ManifestListEntry ::= SEQUENCE {
   hash                  Digest,
   manifestNumber        INTEGER (0..MAX),
-  location              OCTET STRING } -- subjectInfoAccess extnValue
-
+  location              SEQUENCE SIZE (1..MAX) OF AccessDescription }
 END]]>
 </sourcecode>
 
