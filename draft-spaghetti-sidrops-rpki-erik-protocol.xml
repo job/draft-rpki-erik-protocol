@@ -194,7 +194,7 @@ IMPORTS
   { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
     pkcs-9(9) smime(16) modules(0) id-mod-cms-2009(58) }
 
-  AccessDescription
+  AccessDescription, KeyIdentifier
   FROM PKIX1Implicit88 -- in [RFC5280]
   { iso(1) identified-organization(3) dod(6) internet(1) security(5)
     mechanisms(5) pkix(7) id-mod(0) id-pkix1-implicit(19) }
