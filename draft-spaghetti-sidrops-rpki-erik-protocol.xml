@@ -9,7 +9,7 @@
 
 <rfc xmlns:xi="http://www.w3.org/2001/XInclude"
 category="std"
-docName="draft-spaghetti-sidrops-rpki-erik-protocol-00"
+docName="draft-spaghetti-sidrops-rpki-erik-protocol-01"
 ipr="trust200902"
 xml:lang="en"
 sortRefs="true"
@@ -138,7 +138,7 @@ version="3">
            <dd>A sorted listing of Partition identifiers and associated ErikPartition objects' hashes.</dd>
 
            <dt>ErikPartition</dt>
-           <dd>A sorted listing of the Manifest objects' hashes, manifestNumbers, and their certificates' SIA extension values.</dd>
+           <dd>A sorted listing of the manifest objects' hashes, manifestNumbers, and their certificates' SIA extension values.</dd>
 
            <dt>Snapshot</dt>
            <dd>A compressed tarball archive containing all RPKI objects for a given FQDN.</dd>
@@ -163,32 +163,27 @@ version="3">
         The client starts by querying an Erik relay for its current tree head for a given FQDN.
         If the tree head is different compared to the previous run (or compared to the tree head calculated from the locally cached objects), the client can fetch the ErikIndex object using the tree head hash.
         With the ErikIndex in hand, the client can determine which ErikParitions changed or are missing and fetch accordingly.
-        The client then can compare the <em>manifestNumber</em> sequence number for each Manifest listed in the ErikPartition, and proceed to fetch (purportedly) newer versions of Manifests of interest.
-        Whenever a relay offers a Manifest with a lower sequence number the client can ignore it.
-        With the information contained within Manifests, clients can fetch addressed by content and store by name.
+        The client then can compare the <em>manifestNumber</em> sequence number for each manifest listed in the ErikPartition, and proceed to fetch (purportedly) newer versions of manifests of interest.
+        Whenever a relay offers a manifest with a lower sequence number the client can ignore it.
+        With the information contained within manifests, clients can fetch addressed by content and store by name.
         The client now has sufficient information to proceed to fetch any missing Certificates, Signed objects, and CRLs.
       </t>
     </section>
 
     <section anchor="asn1">
-      <name>File Formats</name>
+      <name>Erik Synchronization Data Structure Definitions</name>
       <t>
         In this synchronization protocol the <em>signal layer</em> makes use of DER-encoded messages <xref target="X.690"/>.
       </t>
       <t>
         <em>Design note: DER encoding was selected for its canonical properities and because RPKI cache implementations already support ASN.1 encoding.</em>
       </t>
-      <section anchor="asn1-index">
-        <name>ASN.1 Definition for ErikIndex objects</name>
-        <t>
-          An ErikIndex represents all current Manifest objects available under a given FQDN and thus the complete state of the repository as it is known to the relay.
-        </t>
 <sourcecode type="asn.1" markers="false">
 <![CDATA[
-RpkiErikIndex-2025
+RpkiErikSynchronization-2025
   { iso(1) member-body(2) us(840) rsadsi(113549)
     pkcs(1) pkcs9(9) smime(16) mod(0)
-    id-mod-rpkiErikIndex-2025(TBD) }
+    id-mod-rpkiErikSynchronization-2025(TBD) }
 
 DEFINITIONS EXPLICIT TAGS ::=
 BEGIN
@@ -199,21 +194,45 @@ IMPORTS
   { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
     pkcs-9(9) smime(16) modules(0) id-mod-cms-2009(58) }
 
+  AccessDescription
+  FROM PKIX1Implicit88 -- in [RFC5280]
+  { iso(1) identified-organization(3) dod(6) internet(1) security(5)
+    mechanisms(5) pkix(7) id-mod(0) id-pkix1-implicit(19) }
+
 ErikIndex ::= SEQUENCE {
-  version [0]           INTEGER DEFAULT 0,
-  indexScope            IA5String,
-  indexTime             GeneralizedTime,
-  hashAlg               DigestAlgorithmIdentifier,
-  previousIndex         Digest OPTIONAL,
-  partitionList         SEQUENCE SIZE (1..ub-Partitions) OF PartitionListEntry }
+  version [0]      INTEGER DEFAULT 0,
+  indexScope       IA5String,
+  indexTime        GeneralizedTime,
+  hashAlg          DigestAlgorithmIdentifier,
+  partitionList    SEQUENCE SIZE (1..ub-Partitions) OF PartitionRef }
 
 ub-Partitions INTEGER ::= 1024
 
-PartitionListEntry ::= SEQUENCE {
-  partitionIdentifier   INTEGER (1..ub-Partitions),
-  hash                  Digest }
+PartitionRef ::= SEQUENCE {
+  identifier       INTEGER (1..ub-Partitions),
+  hash             Digest,
+  size             INTEGER (100..MAX) }
+
+ErikPartition ::= SEQUENCE {
+  version [0]      INTEGER DEFAULT 0,
+  partitionTime    GeneralizedTime,
+  hashAlg          DigestAlgorithmIdentifier,
+  manifestList     SEQUENCE SIZE (1..MAX) OF ManifestRef }
+
+ManifestRef ::= SEQUENCE {
+  hash             Digest,
+  size             INTEGER (1000..MAX),
+  aki              KeyIdentifier,
+  manifestNumber   INTEGER (0..MAX),
+  location         SEQUENCE SIZE (1..MAX) OF AccessDescription }
 END]]>
 </sourcecode>
+
+      <section anchor="asn1-index">
+        <name>ErikIndex</name>
+        <t>
+          An ErikIndex represents all current manifest objects available under a given FQDN and thus the complete state of the repository as it is known to the relay.
+        </t>
 
         <section title="The version field">
           <t>
@@ -223,7 +242,7 @@ END]]>
 
         <section title="The indexScope field">
           <t>
-            The <tt>indexScope</tt> field contains the fully qualified domain name of the Signed Object location of the Manifests referenced through this particular ErikIndex.
+            The <tt>indexScope</tt> field contains the fully qualified domain name of the Signed Object location of the manifests referenced through this particular ErikIndex.
             The FQDN MUST be in the "preferred name syntax", as specified by <xref target="RFC1034" section="3.5"/> and modified by <xref target="RFC1123" section="2.1"/>.
           </t>
         </section>
@@ -255,9 +274,9 @@ END]]>
 
         <section title="The partitionList field">
           <t>
-            This field is a sequence of <tt>ErikIndexEntry</tt> instances.
-            There is one <tt>ErikIndexEntry</tt> for each current partition.
-            Each <tt>ErikIndexEntry</tt>is a pair consisting of the partition identifier and the hash of the partition object.
+            This field is a sequence of <tt>PartitionRef</tt> instances.
+            There is one <tt>PartitionRef</tt> for each current ErikPartition.
+            Each <tt>PartitionRef</tt> is a 3-tuple consisting of the partition identifier, the hash of the partition object, and the size of the partition object.
           </t>
           <t>
             Information elements are unique with respect to one another and sorted in ascending order of the partition identifier.
@@ -267,45 +286,11 @@ END]]>
       </section>
 
       <section anchor="asn1-partition">
-        <name>ASN.1 Definition for ErikPartition Objects</name>
+        <name>ErikPartition</name>
         <t>
-          An ErikPartition represents a subset of Manifest objects available under a given FQDN.
-          Each ErikPartition is a sorted listing of the Manifest objects' hashes, manifestNumbers, and their end-entity certificates' SIA extension values.
+          An ErikPartition represents a subset of manifest objects available under a given FQDN.
+          Each ErikPartition is a sorted listing of the manifest objects' hashes, manifestNumbers, and their end-entity certificates' SIA extension values.
         </t>
-
-<sourcecode type="asn.1" markers="false">
-<![CDATA[
-RpkiErikPartition-2025
-  { iso(1) member-body(2) us(840) rsadsi(113549)
-    pkcs(1) pkcs9(9) smime(16) mod(0)
-    id-mod-rpkiErikPartition-2025(TBD) }
-
-DEFINITIONS EXPLICIT TAGS ::=
-BEGIN
-
-IMPORTS
-  AccessDescription
-  FROM PKIX1Implicit88 -- in [RFC5280]
-  { iso(1) identified-organization(3) dod(6) internet(1)
-  security(5) mechanisms(5) pkix(7) id-mod(0) id-pkix1-implicit(19) }
-
-  Digest, DigestAlgorithmIdentifier
-  FROM CryptographicMessageSyntax-2010 -- in [RFC6268]
-  { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
-    pkcs-9(9) smime(16) modules(0) id-mod-cms-2009(58) }
-
-ErikPartition ::= SEQUENCE {
-  version [0]           INTEGER DEFAULT 0,
-  partitionTime         GeneralizedTime,
-  hashAlg               DigestAlgorithmIdentifier,
-  manifestList          SEQUENCE SIZE (1..MAX) OF ManifestListEntry }
-
-ManifestListEntry ::= SEQUENCE {
-  hash                  Digest,
-  manifestNumber        INTEGER (0..MAX),
-  location              SEQUENCE SIZE (1..MAX) OF AccessDescription }
-END]]>
-</sourcecode>
 
         <section title="The version field">
           <t>
@@ -315,7 +300,7 @@ END]]>
 
         <section title="The partitionTime field">
           <t>
-            The <tt>partitionTime</tt> is the most recent <tt>thisUpdate</tt> value among the Manifests contained within this ErikPartition.
+            The <tt>partitionTime</tt> is the most recent <tt>thisUpdate</tt> value among the manifests contained within this ErikPartition.
             The field's value roughly indicates when the ErikPartition was generated.
             The field exists for troubleshooting or measurement purposes.
           </t>
@@ -326,26 +311,26 @@ END]]>
           </t>
           <t>
             <em>
-              Design note: using the most recent Manifest <tt>thisUpdate</tt> value (instead of "now") helps reduce churn in distributed systems.
+              Design note: using the most recent manifest <tt>thisUpdate</tt> value (instead of "now") helps reduce churn in distributed systems.
             </em>
           </t>
         </section>
 
         <section title="The hashAlg field">
           <t>
-            This field contains the OID of the hash algorithm used to hash the Manifest objects referenced in this ErikPartition.
+            This field contains the OID of the hash algorithm used to hash the manifest objects referenced in this ErikPartition.
             The hash algorithm used MUST conform to the RPKI Algorithms and Key Size Profile specification <xref target="RFC7935"/>.
           </t>
         </section>
 
         <section title="The manifestList field">
           <t>
-            This field is a sequence of <tt>ManifestListEntry</tt> instances.
-            There is one <tt>ManifestListEntry</tt> for each current Manifest.
-            A Manifest is nominally current until the time specified in nextUpdate or until a Manifest is issued with a greater manifestNumber, whichever comes first (see <xref target="RFC9286" section="4.2.1"/>).
+            This field is a sequence of <tt>ManifestRef</tt> instances.
+            There is one <tt>ManifestRef</tt> for each current manifest.
+            A manifest is nominally current until the time specified in nextUpdate or until a manifest is issued with a greater manifestNumber, whichever comes first (see <xref target="RFC9286" section="4.2.1"/>).
           </t>
           <t>
-            A <tt>ManifestListEntry</tt> is a 3-tuple consisting of the hash of the Manifest object, the manifestNumber contained within the object, and an OCTET STRING containing the Manifest's End-Entity certificate's Subject Information Access extension value.
+            A <tt>ManifestRef</tt> is a 4-tuple consisting of the hash of the manifest object, the size of the manifest object, the manifest issuer's key identifier, the manifestNumber contained within the object, and a sequence of <tt>AccessDescription</tt> instances from the manifest's End-Entity certificate's Subject Information Access extension.
           </t>
           <t>
             Information elements are unique with respect to one another and sorted in ascending order of the hash.
@@ -385,10 +370,10 @@ END]]>
         A client can decide whether or not to fetch ErikIndex and ErikPartition objects, by comparing the hash to previous fetches.
       </t>
       <t>
-        A client can decide whether or not to fetch a given Manifest object, by comparing the <tt>manifestNumber</tt> with what's locally cached and what's offered by the remote relay.
+        A client can decide whether or not to fetch a given manifest object, by comparing the <tt>manifestNumber</tt> with what's locally cached and what's offered by the remote relay.
       </t>
       <t>
-        A client can compute which products listed in the Manifest's fileList need to be fetched from the relay.
+        A client can compute which products listed in the manifest's fileList need to be fetched from the relay.
       </t>
       <t>
         As there is no concept of 'sessions' (like in RRDP), clients can interchangably use different Erik relay.
@@ -416,8 +401,8 @@ END]]>
       <t>
         <em>
           Design notes: a decision must be made a deterministic "manifest-to-partition" assignment scheme.
-          Job's proof-of-concept relay <!-- (see <xref target="running_code"/>) --> uses the first few octets of the SHA-256 hash of the Manifest for produce as a stable assignment strategy.
-          Other strategies could be to assign Manifests to ErikPartitions based on the "hour-of-day" of the CMS signing timestamp or the Authority Key Identifier.
+          Job's proof-of-concept relay <!-- (see <xref target="running_code"/>) --> uses the first few octets of the SHA-256 hash of the manifest for produce as a stable assignment strategy.
+          Other strategies could be to assign manifests to ErikPartitions based on the "hour-of-day" of the CMS signing timestamp or the Authority Key Identifier.
         </em>
       </t>
     </section>
@@ -428,7 +413,7 @@ END]]>
       <t>
         Ignoring obvious "on the wire format" differences between Erik, Rsync, and RRDP; there are a number of key design differences between the protocols.
         Rsync and RRDP can be described as "general purpose" synchronisation protocols, while the Erik protocol design is RPKI-specific.
-        In the Erik protocol, Manifest objects (which RPs require for validation anyway) are an integral part of the signaling layer.
+        In the Erik protocol, manifest objects (which RPs require for validation anyway) are an integral part of the signaling layer.
       </t>
 
       <section>
@@ -476,10 +461,11 @@ END]]>
       <name>Open Questions</name>
        <ul>
          <li>Should the hash tree heads contain a <tt>previous hash</tt> field so clients can observe gaps in chains?</li>
-         <li>Should ErikPartitions also list the filesize of the referenced Manifests? Perhaps there are optimisations possible when the filesizes are communicated to clients?</li>
+         <li>Should ErikPartitions also list the filesize of the referenced manifests? Perhaps there are optimisations possible when the filesizes are communicated to clients?</li>
          <li>Which of the possible deterministic manifest-to-partition assignment strategies yield the best results?</li>
          <li>What is the best archive format for Snapshots? The ustar/gzip combo might not easily yield deterministic results across different implementations.</li>
-         <li>Is the concept of Differentials/Deltas needed in Erik Synchronisation?</li>
+         <li>Is the concept of Differentials/Deltas needed in Erik Synchronization?</li>
+         <li>What will be the upperbound for the number of partitions? (<tt>ub-Partitions</tt>)</li>
        </ul>
     </section>
 
@@ -510,10 +496,9 @@ END]]>
       </t>
       <artwork>
 <![CDATA[
-Decimal  Description                      References
+Decimal  Description                           References
 --------------------------------------------------------------
-    TDB  id-mod-rpkiErikIndex-2025        [this-draft]
-    TDB  id-mod-rpkiErikPartition-2025    [this-draft]
+    TDB  id-mod-rpkiErikSynchronization-2025   [this-draft]
 ]]>
         </artwork>
     </section>
