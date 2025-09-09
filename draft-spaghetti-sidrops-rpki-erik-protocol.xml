@@ -189,7 +189,7 @@ DEFINITIONS EXPLICIT TAGS ::=
 BEGIN
 
 IMPORTS
-  Digest, DigestAlgorithmIdentifier
+  CONTENT-TYPE, Digest, DigestAlgorithmIdentifier
   FROM CryptographicMessageSyntax-2010 -- in [RFC6268]
   { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
     pkcs-9(9) smime(16) modules(0) id-mod-cms-2009(58) }
@@ -198,6 +198,14 @@ IMPORTS
   FROM PKIX1Implicit88 -- in [RFC5280]
   { iso(1) identified-organization(3) dod(6) internet(1) security(5)
     mechanisms(5) pkix(7) id-mod(0) id-pkix1-implicit(19) }
+;
+
+ct-rpkiErikIndex CONTENT-TYPE ::=
+  { TYPE ErikIndex IDENTIFIED BY id-ct-rpkiErikIndex }
+
+id-ct-rpkiErikIndex OBJECT IDENTIFIER ::=
+  { iso(1) identified-organization(3) dod(6) internet(1) private(4)
+    enterprise(1) snijders(41948) erikindex(826) }
 
 ErikIndex ::= SEQUENCE {
   version [0]      INTEGER DEFAULT 0,
@@ -212,6 +220,13 @@ PartitionRef ::= SEQUENCE {
   identifier       INTEGER (1..ub-Partitions),
   hash             Digest,
   size             INTEGER (100..MAX) }
+
+ct-rpkiErikPartition CONTENT-TYPE ::=
+  { TYPE ErikPartition IDENTIFIED BY id-ct-rpkiErikPartition }
+
+id-ct-rpkiErikPartition OBJECT IDENTIFIER ::=
+  { iso(1) identified-organization(3) dod(6) internet(1) private(4)
+    enterprise(1) snijders(41948) erikpartition(827) }
 
 ErikPartition ::= SEQUENCE {
   version [0]      INTEGER DEFAULT 0,
@@ -349,7 +364,8 @@ END]]>
         Because snapshots are not produced in lockstep with updates to the merkle trees, clients MUST perform a tree comparison after fetching a snapshot.
       </t>
       <t>
-        Snapshots are encoded using the POSIX <xref target="ustar" /> format and compressed using GZIP (<xref target="RFC1951"/>, <xref target="RFC1952"/>).
+        Snapshots encoding is TBD.
+        A compressed form (<xref target="RFC1951"/>, <xref target="RFC1952"/>) should be used because opportunistic compression in the transport layer (e.g. HTTP compressed content-encoding) is not universally available.
       </t>
       <t>
         Differences between snapshots will be specified at a later time.
@@ -357,9 +373,7 @@ END]]>
       <t>
         <em>
           Design notes:
-          The ustar format was selected because it is 'streamable', widely available, and an open standard.
-          A compressed form is mandated because opportunistic compression in the transport layer (e.g. HTTP compressed content-encoding) is not universally available.
-          On the flip side, <tt>.tar.gz</tt> objects likely wont be produced in a deterministic fashion across different implementations, warranting a choice of some other archive format.
+          While the gzipped <xref target="ustar"/> format is 'streamable', widely available, and an open standard, a notable downside is that <tt>.tar.gz</tt> objects likely wont be produced in a deterministic fashion across different implementations, warranting a choice for a bespoke format.
         </em>
       </t>
     </section>
@@ -378,6 +392,21 @@ END]]>
       <t>
         As there is no concept of 'sessions' (like in RRDP), clients can interchangably use different Erik relay.
         When one Erik relay generates a HTTP error, the client can try fetching the requested object from another Erik relay.
+      </t>
+    </section>
+
+    <section anchor="querying">
+      <name>Querying an Erik Relay</name>
+      <t>
+        This specification uses "Named Information" identifiers mapped to <tt>.well-known</tt> HTTP/HTTPS URLs for object retrieval, as described in <xref target="RFC6920"/>.
+      </t>
+      <t>
+        For example, issuance <tt>#54</tt> of <tt>ripe-ncc-ta.mft</tt> has the following SHA256 digest: <tt>c2d0427bc5a32c42eea1ab5663d592b1fc29c7d4ef16ab0b5e1d631d039dcc21</tt>.
+        To fetch this object from an relay hosted at <tt>relay.example.net</tt>, a client would access the following HTTP URL:
+        <tt>https://relay.example.net/.well-known/ni/sha-256/wtBCe8WjLELuoatWY9WSsfwpx9TvFqsLXh1jHQOdzCE</tt>
+      </t>
+      <t>
+        An ErikIndex for a the <tt>rpki.ripe.net</tt> FQDN can be retrieved as following: <tt>https://relay.example.net/.well-known/erik/rpki.ripe.net</tt>
       </t>
     </section>
 
@@ -447,9 +476,8 @@ END]]>
         <section>
           <name>Garbage Collection</name>
           <t>
-            In contrast to RRDP, the Erik protocol has no concept of server-specific "stateful" sessions that persist across polling attempts, obviating the need for <tt>withdraw</tt> instructions.
-            Clients can simply delete objects that are no longer referenced from their current validation state.
-            <!-- In a way RRDP servers offer a <em>set menu</em> while Erik relays allow clients to select items <em>a la carte</em>. -->
+            In contrast to RRDP, the Erik protocol has no concept of server-specific "stateful" sessions that persist across polling attempts.
+            This obviates the need for <tt>withdraw</tt> instructions as part of the protocol exchange: clients can simply delete objects that are no longer referenced from their current validation state and refetch them later on if needed.
           </t>
         </section>
 
@@ -491,16 +519,29 @@ END]]>
 
     <section anchor="iana">
       <name>IANA Considerations</name>
-      <t>
-        The IANA is requested to add an item to the "SMI Security for S/MIME Module Identifier" registry as follows:
-      </t>
-      <artwork>
+
+      <section title="S/MIME Module Identifier">
+        <t>
+          The IANA is requested to add an item to the "SMI Security for S/MIME Module Identifier" registry as follows:
+        </t>
+        <artwork>
 <![CDATA[
 Decimal  Description                           References
 --------------------------------------------------------------
     TDB  id-mod-rpkiErikSynchronization-2025   [this-draft]
 ]]>
         </artwork>
+      </section>
+
+      <section title="Well-Known URI">
+        <t>
+          IANA is requested to assign a URI Suffix in the Well-Known URIs registry specific to Erik synchronization.
+        </t>
+        <t>
+          The Suffix is TBD.
+        </t>
+      </section>
+
     </section>
 
   </middle>
