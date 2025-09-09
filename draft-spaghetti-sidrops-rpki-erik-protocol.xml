@@ -406,7 +406,7 @@ END]]>
         <tt>https://relay.example.net/.well-known/ni/sha-256/wtBCe8WjLELuoatWY9WSsfwpx9TvFqsLXh1jHQOdzCE</tt>
       </t>
       <t>
-        An ErikIndex for a the <tt>rpki.ripe.net</tt> FQDN can be retrieved as following: <tt>https://relay.example.net/.well-known/erik/rpki.ripe.net</tt>
+        An ErikIndex for the <tt>rpki.ripe.net</tt> FQDN can be retrieved as following: <tt>https://relay.example.net/.well-known/erik/rpki.ripe.net</tt>
       </t>
     </section>
 
