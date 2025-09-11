@@ -265,8 +265,7 @@ END]]>
         <section title="The indexTime field">
           <t>
             The <tt>indexTime</tt> is the most recent <tt>partitionTime</tt> value among the ErikPartitions referenced from this ErikIndex.
-            The field's value roughly indicates when the ErikIndex was generated.
-            The field exists for troubleshooting or measurement purposes.
+            The field's value roughly indicates when the ErikIndex was generated and can be used for troubleshooting and measurement purposes.
           </t>
           <t>
             For the purposes of this profile, <tt>GeneralizedTime</tt> values MUST be expressed UTC (Zulu) and MUST include seconds (i.e., times are YYYYMMDDHHMMSSZ), even where the number of seconds is zero.
@@ -275,7 +274,7 @@ END]]>
           </t>
           <t>
             <em>
-              Design note: using the most recent <tt>partitionTime</tt> (rather than "now") helps reduce churn in distributed systems.
+              Design note: using the most recent <tt>partitionTime</tt>, rather than the local system's notion of "now", helps reduce churn in distributed systems.
             </em>
           </t>
         </section>
@@ -316,8 +315,7 @@ END]]>
         <section title="The partitionTime field">
           <t>
             The <tt>partitionTime</tt> is the most recent <tt>thisUpdate</tt> value among the manifests contained within this ErikPartition.
-            The field's value roughly indicates when the ErikPartition was generated.
-            The field exists for troubleshooting or measurement purposes.
+            The field's value roughly indicates when the ErikPartition was generated and can be used for troubleshooting and measurement purposes.
           </t>
           <t>
             For the purposes of this profile, <tt>GeneralizedTime</tt> values MUST be expressed UTC (Zulu) and MUST include seconds (i.e., times are YYYYMMDDHHMMSSZ), even where the number of seconds is zero.
@@ -326,7 +324,7 @@ END]]>
           </t>
           <t>
             <em>
-              Design note: using the most recent manifest <tt>thisUpdate</tt> value (instead of "now") helps reduce churn in distributed systems.
+              Design note: using the most recent manifest <tt>thisUpdate</tt> value, rather than the local system's notion of "now", helps reduce churn in distributed systems.
             </em>
           </t>
         </section>
@@ -358,22 +356,24 @@ END]]>
     <section anchor="snapshots">
       <name>Snapshots and Differentials</name>
       <t>
-        Clients can bootstrap initial state by fetching a snapshot.
+        Clients should be able to bootstrap initial state by fetching a snapshot.
         A snapshot contains all RPKI objects a relay associated with a given FQDN as of the time of the snapshot's production.
         Snapshots do not contain ErikIndex or ErikPartition objects.
         Because snapshots are not produced in lockstep with updates to the merkle trees, clients MUST perform a tree comparison after fetching a snapshot.
       </t>
       <t>
-        Snapshots encoding is TBD.
+        Note: Snapshots encoding is TBD.
+      </t>
+      <t>
         A compressed form (<xref target="RFC1951"/>, <xref target="RFC1952"/>) should be used because opportunistic compression in the transport layer (e.g. HTTP compressed content-encoding) is not universally available.
       </t>
       <t>
-        Differences between snapshots will be specified at a later time.
+        Fetching differences between snapshots ('deltas') might be specified at a later time, or might be concluded to be unnecessary.
       </t>
       <t>
         <em>
           Design notes:
-          While the gzipped <xref target="ustar"/> format is 'streamable', widely available, and an open standard, a notable downside is that <tt>.tar.gz</tt> objects likely wont be produced in a deterministic fashion across different implementations, warranting a choice for a bespoke format.
+          While the <xref target="ustar"/> format is 'streamable', widely available, and an open standard, a notable downside is that <tt>.tar.gz</tt> objects likely wont be produced in a deterministic fashion across different implementations, warranting a choice for a bespoke format.
         </em>
       </t>
     </section>
@@ -397,17 +397,26 @@ END]]>
 
     <section anchor="querying">
       <name>Querying an Erik Relay</name>
-      <t>
-        This specification uses "Named Information" identifiers mapped to <tt>.well-known</tt> HTTP/HTTPS URLs for object retrieval, as described in <xref target="RFC6920"/>.
-      </t>
-      <t>
-        For example, issuance <tt>#54</tt> of <tt>ripe-ncc-ta.mft</tt> has the following SHA256 digest: <tt>c2d0427bc5a32c42eea1ab5663d592b1fc29c7d4ef16ab0b5e1d631d039dcc21</tt>.
-        To fetch this object from an relay hosted at <tt>relay.example.net</tt>, a client would access the following HTTP URL:
-        <tt>https://relay.example.net/.well-known/ni/sha-256/wtBCe8WjLELuoatWY9WSsfwpx9TvFqsLXh1jHQOdzCE</tt>
-      </t>
-      <t>
-        An ErikIndex for the <tt>rpki.ripe.net</tt> FQDN can be retrieved as following: <tt>https://relay.example.net/.well-known/erik/rpki.ripe.net</tt>
-      </t>
+      <section title="Fetching objects by hash">
+        <t>
+          This specification uses "Named Information" identifiers mapped to <tt>.well-known</tt> HTTP/HTTPS URLs for object retrieval, as described in <xref target="RFC6920"/>.
+        </t>
+        <t>
+          For example, issuance <tt>#54</tt> of <tt>ripe-ncc-ta.mft</tt> has the following SHA256 digest: <tt>c2d0427bc5a32c42eea1ab5663d592b1fc29c7d4ef16ab0b5e1d631d039dcc21</tt>.
+        </t>
+        <t>
+          To fetch the aforementioned object from an relay hosted at <tt>relay.example.net</tt>, a client would access the following HTTP URL:
+          <tt>https://relay.example.net/.well-known/ni/sha-256/wtBCe8WjLELuoatWY9WSsfwpx9TvFqsLXh1jHQOdzCE</tt>
+        </t>
+      </section>
+      <section title="Fetching ErikIndex objects">
+        <t>
+          The URIs to fetch ErikIndex objects can be constructed using the following Well-Known URI template with the <tt>erik</tt> keyword as suffix and the <tt>IndexScope</tt> as parameter: <tt>https://{relay_host}/.well-known/erik/{indexScope}</tt>.
+        </t>
+        <t>
+          For example, the URI to fetch an ErikIndex for the <tt>rpki.ripe.net</tt> <tt>indexScope</tt> from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/rpki.ripe.net</tt>.
+        </t>
+      </section>
     </section>
 
     <section anchor="error">
@@ -535,10 +544,7 @@ Decimal  Description                           References
 
       <section title="Well-Known URI">
         <t>
-          IANA is requested to assign a URI Suffix in the Well-Known URIs registry specific to Erik synchronization.
-        </t>
-        <t>
-          The Suffix is TBD.
+          An URI Suffix in the Well-Known URIs registry specific to Erik synchronization will be requested.
         </t>
       </section>
 
