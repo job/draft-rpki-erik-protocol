@@ -542,9 +542,19 @@ Decimal  Description                           References
         </artwork>
       </section>
 
+      <section title="OIDs for Content Types">
+        <t>
+          For the current proof-of-concept phase the <tt>id-ct-rpkiErikIndex</tt> and <tt>id-ct-rpkiErikPartition</tt> OIDs were assigned from a PEN arc.
+          This section will be updated once it is clear which IANA-managed registries would be best suited for OID assignment for these object identifiers.
+        </t>
+      </section>
+
       <section title="Well-Known URI">
         <t>
           An URI Suffix in the Well-Known URIs registry specific to Erik synchronization will be requested.
+        </t>
+        <t>
+          The proposed suffix is <tt>erik</tt>.
         </t>
       </section>
 
