@@ -552,6 +552,7 @@ Decimal  Description                           References
       <section title="Well-Known URI">
         <t>
           An URI Suffix in the Well-Known URIs registry specific to Erik synchronization will be requested.
+          See https://github.com/protocol-registries/well-known-uris/issues/67 for the request.
         </t>
         <t>
           The proposed suffix is <tt>erik</tt>.
