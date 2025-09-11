@@ -135,10 +135,10 @@ version="3">
            <dd>Also known as "root hash", this is the hash of the current ErikIndex associated with a given FQDN.</dd>
 
            <dt>ErikIndex</dt>
-           <dd>A sorted listing of Partition identifiers and associated ErikPartition objects' hashes.</dd>
+           <dd>An ordered listing of Partition identifiers and associated ErikPartition objects' hashes.</dd>
 
            <dt>ErikPartition</dt>
-           <dd>A sorted listing of the manifest objects' hashes, manifestNumbers, and their certificates' SIA extension values.</dd>
+           <dd>An ordered listing of the manifest objects' hashes, manifestNumbers, and their certificates' SIA extension values.</dd>
 
            <dt>Snapshot</dt>
            <dd>A compressed tarball archive containing all RPKI objects for a given FQDN.</dd>
@@ -304,7 +304,7 @@ END]]>
         <name>ErikPartition</name>
         <t>
           An ErikPartition represents a subset of manifest objects available under a given FQDN.
-          Each ErikPartition is a sorted listing of the manifest objects' hashes, manifestNumbers, and their end-entity certificates' SIA extension values.
+          Each ErikPartition is an ordered listing of the manifest objects' hashes, manifestNumbers, and their end-entity certificates' SIA extension values.
         </t>
 
         <section title="The version field">
