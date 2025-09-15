@@ -138,7 +138,7 @@ version="3">
            <dd>An ordered listing of Partition identifiers and associated ErikPartition objects' hashes.</dd>
 
            <dt>ErikPartition</dt>
-           <dd>An ordered listing of the manifest objects' hashes, manifestNumbers, and their certificates' SIA extension values.</dd>
+           <dd>An ordered listing of the manifest objects' hashes, manifestNumber values, thisUpdate values, and their certificates' SIA extension values.</dd>
 
            <dt>Snapshot</dt>
            <dd>A compressed tarball archive containing all RPKI objects for a given FQDN.</dd>
@@ -239,6 +239,7 @@ ManifestRef ::= SEQUENCE {
   size             INTEGER (1000..MAX),
   aki              KeyIdentifier,
   manifestNumber   INTEGER (0..MAX),
+  thisUpdate       GeneralizedTime,
   location         SEQUENCE SIZE (1..MAX) OF AccessDescription }
 END]]>
 </sourcecode>
@@ -303,7 +304,7 @@ END]]>
         <name>ErikPartition</name>
         <t>
           An ErikPartition represents a subset of manifest objects available under a given FQDN.
-          Each ErikPartition is an ordered listing of the manifest objects' hashes, manifestNumbers, and their end-entity certificates' SIA extension values.
+          Each ErikPartition is an ordered listing of the manifest objects' hashes, manifestNumber values, thisUpdate values, and their end-entity certificates' SIA extension values.
         </t>
 
         <section title="The version field">
@@ -343,7 +344,7 @@ END]]>
             A manifest is nominally current until the time specified in nextUpdate or until a manifest is issued with a greater manifestNumber, whichever comes first (see <xref target="RFC9286" section="4.2.1"/>).
           </t>
           <t>
-            A <tt>ManifestRef</tt> is a 4-tuple consisting of the hash of the manifest object, the size of the manifest object, the manifest issuer's key identifier, the manifestNumber contained within the object, and a sequence of <tt>AccessDescription</tt> instances from the manifest's End-Entity certificate's Subject Information Access extension.
+            A <tt>ManifestRef</tt> is a 4-tuple consisting of the hash of the manifest object, the size of the manifest object, the manifest issuer's key identifier, the manifestNumber, and the thisUpdate contained within the object, and a sequence of <tt>AccessDescription</tt> instances from the manifest's End-Entity certificate's Subject Information Access extension.
           </t>
           <t>
             Information elements are unique with respect to one another and sorted in ascending order of the hash.
@@ -384,7 +385,7 @@ END]]>
         A client can decide whether or not to fetch ErikIndex and ErikPartition objects, by comparing the hash to previous fetches.
       </t>
       <t>
-        A client can decide whether or not to fetch a given manifest object, by comparing the <tt>manifestNumber</tt> with what's locally cached and what's offered by the remote relay.
+        A client can decide whether or not to fetch a given manifest object, by comparing the <tt>manifestNumber</tt> and <tt>thisUpdate</tt> with what's locally cached and what's offered by the remote relay.
       </t>
       <t>
         A client can compute which products listed in the manifest's fileList need to be fetched from the relay.
