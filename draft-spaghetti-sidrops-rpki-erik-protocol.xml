@@ -9,7 +9,7 @@
 
 <rfc xmlns:xi="http://www.w3.org/2001/XInclude"
 category="std"
-docName="draft-spaghetti-sidrops-rpki-erik-protocol-01"
+docName="draft-spaghetti-sidrops-rpki-erik-protocol-03"
 ipr="trust200902"
 xml:lang="en"
 sortRefs="true"
@@ -440,8 +440,8 @@ END]]>
       <t>
         <em>
           Design notes: a decision must be made a deterministic "manifest-to-partition" assignment scheme.
-          Job's proof-of-concept relay <!-- (see <xref target="running_code"/>) --> uses the first few octets of the SHA-256 hash of the manifest for produce as a stable assignment strategy.
-          Other strategies could be to assign manifests to ErikPartitions based on the "hour-of-day" of the CMS signing timestamp or the Authority Key Identifier.
+          Job's proof-of-concept relay (see <xref target="running_code"/>) uses the first few octets of the the Manifest's AKI as a stable partition assignment scheme.
+          Other strategies could be to assign manifests to ErikPartitions based on the "hour-of-day" of the CMS signing timestamp, or the first few octets of the SHA-256 of the manifest object.
         </em>
       </t>
     </section>
