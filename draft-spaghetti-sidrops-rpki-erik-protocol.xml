@@ -646,7 +646,6 @@ Decimal  Description                           References
       </references>
     </references>
 
-<!--
     <section anchor="running_code" title="Implementation status" removeInRFC="true">
       <t>
         This section records the status of known implementations of the protocol defined by this specification at the time of posting of this Internet-Draft, and is based on a proposal described in RFC 7942.
@@ -662,13 +661,14 @@ Decimal  Description                           References
         It is up to the individual working groups to use this information as they see fit".
       </t>
       <t>
-        An experimental Erik relay is available here: <tt>https://cache.rpki-client.org/rpki/{FQDN}</tt>.
+        An experimental Erik relay is available here: <tt>https://aws.rpki-servers.org/</tt>.
       </t>
+<!--
       <t>
         An experimental Erik client was developed by Job Snijders using <tt>ksh</tt>, <tt>C</tt>, and <tt>Python</tt>.
       </t>
-    </section>
 -->
+    </section>
 
     <section anchor="acknowledgements" numbered="false">
       <name>Acknowledgements</name>
