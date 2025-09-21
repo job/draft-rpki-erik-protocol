@@ -131,17 +131,11 @@ version="3">
            <dt>Hash</dt>
            <dd>A message digest calculated for an object using the SHA-256 algorithm.</dd>
 
-           <dt>Tree head</dt>
-           <dd>Also known as "root hash", this is the hash of the current ErikIndex associated with a given FQDN.</dd>
-
            <dt>ErikIndex</dt>
            <dd>An ordered listing of Partition identifiers and associated ErikPartition objects' hashes.</dd>
 
            <dt>ErikPartition</dt>
            <dd>An ordered listing of the manifest objects' hashes, manifestNumber values, thisUpdate values, and their certificates' SIA extension values.</dd>
-
-           <dt>Snapshot</dt>
-           <dd>A compressed tarball archive containing all RPKI objects for a given FQDN.</dd>
 
         </dl>
       </section>
@@ -153,20 +147,20 @@ version="3">
       <t>
         In this synchronization protocol Merkle trees are used to determine whether differences exist between client and relay.
         Merkle trees are hierarchical data structures: the hash value of each node is computed recursively by hashing the concatenated hash values of the node's children.
-        The tree head hash represents the entire dataset.
-        If the tree head hash is not the same between two replicas, the relay provides the client with hashes of smaller and smaller portions of the to-be-replicated dataset until the exact list of out-of-sync or missing objects is identified.
+        The hash of the ErikIndex represents the entire dataset related to a given FQDN.
+        If the ErikIndex hash is not the same between two replicas, the relay provides the client with hashes of smaller and smaller portions of the to-be-replicated dataset until the exact list of out-of-sync or missing objects is identified.
         Sequence numbers are then used to determine whether these differences are relevant enough for the client to fetch.
-        All data is fetched using addresses derived from hashes (except for the hash tree heads).
+        All data is fetched using addresses derived from hashes (except for ErikIndex objects).
         This approach reduces unnecessary data transfer between caches which contain mostly similar data.
       </t>
       <t>
-        The client starts by querying an Erik relay for its current tree head for a given FQDN.
-        If the tree head is different compared to the previous run (or compared to the tree head calculated from the locally cached objects), the client can fetch the ErikIndex object using the tree head hash.
-        With the ErikIndex in hand, the client can determine which ErikParitions changed or are missing and fetch accordingly.
-        The client then can compare the <em>manifestNumber</em> sequence number for each manifest listed in the ErikPartition, and proceed to fetch (purportedly) newer versions of manifests of interest.
-        Whenever a relay offers a manifest with a lower sequence number the client can ignore it.
-        With the information contained within manifests, clients can fetch addressed by content and store by name.
+        The client starts by querying an Erik relay for the relay's current ErikIndex for a given FQDN.
+        If the ErikIndex is different compared to the previous run (or compared to the Index calculated from the locally cached objects).
+        With the ErikIndex in hand, the client can determine which ErikParitions are missing and fetch accordingly.
+        The client then can compare the <em>manifestNumber</em> sequence number and <em>thisUpdate</em> for each manifest listed in the ErikPartition, and proceed to fetch (purportedly) newer versions of manifests of interest.
+        Whenever a relay has manifests with a lower sequence number on offer, the client can ignore those.
         The client now has sufficient information to proceed to fetch any missing Certificates, Signed objects, and CRLs.
+        With the information contained within manifests, clients can fetch addressed by content (by hash) and store by name (or some other scheme).
       </t>
     </section>
 
@@ -354,6 +348,7 @@ END]]>
       </section>
     </section>
 
+<!--
     <section anchor="snapshots">
       <name>Snapshots and Differentials</name>
       <t>
@@ -379,16 +374,17 @@ END]]>
       </t>
     </section>
 
+-->
     <section anchor="rp">
       <name>Client-side Processing</name>
       <t>
-        A client can decide whether or not to fetch ErikIndex and ErikPartition objects, by comparing the hash to previous fetches.
+        A client can decide whether or not to fetch <tt>ErikIndex</tt> and <tt>ErikPartition</tt> objects, by comparing the hash to previous fetches.
       </t>
       <t>
         A client can decide whether or not to fetch a given manifest object, by comparing the <tt>manifestNumber</tt> and <tt>thisUpdate</tt> with what's locally cached and what's offered by the remote relay.
       </t>
       <t>
-        A client can compute which products listed in the manifest's fileList need to be fetched from the relay.
+        A client can compute which products listed in the manifest's <tt>fileList</tt> need to be fetched from the relay.
       </t>
       <t>
         As there is no concept of 'sessions' (like in RRDP), clients can interchangably use different Erik relay.
@@ -498,10 +494,8 @@ END]]>
     <section anchor="openquestions" removeInRFC="true">
       <name>Open Questions</name>
        <ul>
-         <li>Should the hash tree heads contain a <tt>previous hash</tt> field so clients can observe gaps in chains?</li>
-         <li>Should ErikPartitions also list the filesize of the referenced manifests? Perhaps there are optimisations possible when the filesizes are communicated to clients?</li>
-         <li>Which of the possible deterministic manifest-to-partition assignment strategies yield the best results?</li>
-         <li>What is the best archive format for Snapshots? The ustar/gzip combo might not easily yield deterministic results across different implementations.</li>
+         <li>Which of the possible deterministic manifest-to-partition assignment strategies yield the best results? AKI?</li>
+         <li>Are deterministic and cheap Snapshots possible? If so, what is the best archive format for Snapshots? The ustar/gzip combo might not easily yield deterministic results across different implementations.</li>
          <li>Is the concept of Differentials/Deltas needed in Erik Synchronization?</li>
          <li>What will be the upperbound for the number of partitions? (<tt>ub-Partitions</tt>)</li>
        </ul>
@@ -572,8 +566,10 @@ Decimal  Description                           References
 
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1034.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1123.xml"/>
+<!--
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1951.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1952.xml"/>
+-->
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.5280.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.6920.xml"/>
@@ -610,6 +606,7 @@ Decimal  Description                           References
           <seriesInfo name="DOI" value="10.1007/3-540-48184-2_32"/>
         </reference>
 
+<!--
         <reference anchor="ustar" target="https://pubs.opengroup.org/onlinepubs/9799919799/utilities/pax.html#tag_20_94_13_06">
           <front>
             <title>ustar Interchange Format</title>
@@ -621,6 +618,7 @@ Decimal  Description                           References
           <seriesInfo name="IEEE Std" value="1003.1-2024"/>
           <seriesInfo name="DOI" value="10.1109/IEEESTD.2018.8423794"/>
         </reference>
+-->
 
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.0677.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1925.xml"/>
@@ -628,8 +626,14 @@ Decimal  Description                           References
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.6480.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8182.xml"/>
 
+        <reference anchor="rpkitouch" target="https://www.github.com/job/rpkitouch">
+          <front>
+            <title>rpkitouch</title>
+            <author fullname="Job Snijders"/>
+            <date month="September" year="2025" />
+          </front>
+        </reference>
 <!--
- later ...
         <reference anchor="rpki-client" target="https://www.rpki-client.org/">
           <front>
             <title>rpki-client</title>
@@ -640,7 +644,6 @@ Decimal  Description                           References
             <date month="June" year="2024" />
           </front>
         </reference>
-
 -->
 
       </references>
@@ -661,13 +664,27 @@ Decimal  Description                           References
         It is up to the individual working groups to use this information as they see fit".
       </t>
       <t>
-        An experimental Erik relay is available here: <tt>https://aws.rpki-servers.org/</tt>.
+        A few experimental Erik relays are available, each running on slightly different schedules.
+        Client implementers are encouraged to round-robin between these instances to observe results.
       </t>
-<!--
+      <dl>
+        <dt><tt>http://aws.rpki-servers.org/</tt></dt>
+        <dd>Dublin, Ireland, - distributed computing cluster (6 machines, NFS backend)</dd>
+
+        <dt><tt>http://atl.rpki-servers.org/</tt></dt>
+        <dd>Atlanta, USA, - distributed computing cluster (2 machines, NFS backend)</dd>
+
+        <dt><tt>http://miso.sobornost.net/</tt></dt>
+        <dd>Amsterdam, NL, single node</dd>
+
+        <dt><tt>http://nyc1.digitalocean.rpkiviews.org/</tt></dt>
+        <dd>New York, USA, - single node</dd>
+      </dl>
+
       <t>
-        An experimental Erik client was developed by Job Snijders using <tt>ksh</tt>, <tt>C</tt>, and <tt>Python</tt>.
+        An experimental Erik static content generator was developed by Job Snijders in the form of <xref target="rpkitouch"/> using <tt>C</tt>.
       </t>
--->
+
     </section>
 
     <section anchor="acknowledgements" numbered="false">
