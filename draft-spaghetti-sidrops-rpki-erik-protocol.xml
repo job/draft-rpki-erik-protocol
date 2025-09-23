@@ -696,11 +696,17 @@ Decimal  Description                           References
 
       <section>
         <name>Example ErikIndex</name>
+        <t>
+          This object was retrieved from <tt>http://miso.sobornost.net/.well-known/erik/rpki.ripe.net</tt>.
+        </t>
         <sourcecode anchor="ex_index" type="base64" src="rpki.ripe.net.b64"/>
       </section>
 
       <section>
         <name>Example ErikPartition</name>
+        <t>
+          This object was retrieved from <tt>http://miso.sobornost.net/.well-known/ni/sha-256/c2zSaUVzFAW7XY7BDGXzGvjLR0xlRmo2gD_FuC70mGQ</tt>.
+        </t>
         <sourcecode anchor="ex_part" type="base64" src="c2zSaUVzFAW7XY7BDGXzGvjLR0xlRmo2gD_FuC70mGQ.b64"/>
       </section>
     </section>
