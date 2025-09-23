@@ -348,7 +348,8 @@ END]]>
       </section>
     </section>
 
-<!--
+<!-- XXX NOTE: it is not clear how to do snapshots or whether it is needed.
+
     <section anchor="snapshots">
       <name>Snapshots and Differentials</name>
       <t>
@@ -373,8 +374,8 @@ END]]>
         </em>
       </t>
     </section>
-
 -->
+
     <section anchor="rp">
       <name>Client-side Processing</name>
       <t>
@@ -687,6 +688,23 @@ Decimal  Description                           References
 
     </section>
 
+    <section anchor="example_payloads">
+      <name>Example objects</name>
+      <t>
+        Included in this section are an <tt>ErikIndex</tt> for <tt>rpki.ripe.net</tt> and an <tt>ErikPartition</tt> referenced from the aforementioned ErikIndex, both Base64 encoded.
+      </t>
+
+      <section>
+        <name>Example ErikIndex</name>
+        <sourcecode anchor="ex_index" type="base64" src="rpki.ripe.net.b64"/>
+      </section>
+
+      <section>
+        <name>Example ErikPartition</name>
+        <sourcecode anchor="ex_part" type="base64" src="c2zSaUVzFAW7XY7BDGXzGvjLR0xlRmo2gD_FuC70mGQ.b64"/>
+      </section>
+    </section>
+
     <section anchor="acknowledgements" numbered="false">
       <name>Acknowledgements</name>
       <t>
@@ -701,5 +719,6 @@ Decimal  Description                           References
         This protocol is named after Erik Bais, who passed away in 2024, as a small token of appreciation for his friendship.
       </t>
     </section>
+
   </back>
 </rfc>

@@ -7,7 +7,7 @@ all: draft upload
 draft: $(NAME).txt
 
 $(NAME).txt: $(NAME).xml
-	xml2rfc $(NAME).xml --html --text --expand
+	xml2rfc $(NAME).xml --html --text --expand --allow-local-file-access
 	cp $(NAME).exp.xml ~/Downloads/
 	cp $(NAME).html ~/Downloads/
 	cp $(NAME).txt ~/Downloads/
