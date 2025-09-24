@@ -94,6 +94,22 @@ version="3">
         The protocol's design is intended to be efficient, fast, and easy to implement <xref target="RFC1925"/>.
       </t>
 
+      <t>
+        The notion of cache-to-cache data replication was documented in <xref target="RFC7115" section="3"/>.
+      </t>
+      <blockquote quotedFrom="RFC7115, section 3">
+        <t>
+           Validated caches may also be created and maintained from other validated caches.
+           Network operators SHOULD take maximum advantage of this feature to minimize load on the global distributed RPKI database.
+           Of course, the recipient relying parties should re-validate the data.
+        </t>
+      </blockquote>
+
+      <t>
+        Historic records show that experiments have been performed in this space using, for example, peer-to-peer file sharing technology (see <xref target="P2P"/>), but no standardised and widely-deployed mechanism for cache-to-cache replication emerged since then.
+        The authors hope that the Erik Synchronization protocol might be suitable to fill this gap and help reduce load on the global RPKI.
+      </t>
+
       <section anchor="reqs-lang">
         <name>Requirements Language</name>
         <t>
@@ -607,6 +623,17 @@ Decimal  Description                           References
           <seriesInfo name="DOI" value="10.1007/3-540-48184-2_32"/>
         </reference>
 
+        <reference anchor="P2P" target="https://www.ietf.org/proceedings/83/slides/slides-83-sidr-9.pdf">
+          <front>
+            <title>RPKI Over Bittorrent</title>
+            <author fullname="Rob Austein" initials="R." surname="Austein"/>
+            <author fullname="Randy Bush" initials="R." surname="Bush"/>
+            <author fullname="Michael Elkins" initials="M." surname="Elkins"/>
+            <author fullname="Leif Johansson" initials="L." surname="Johansson"/>
+            <date year="2012" month="March"/>
+          </front>
+        </reference>
+
 <!--
         <reference anchor="ustar" target="https://pubs.opengroup.org/onlinepubs/9799919799/utilities/pax.html#tag_20_94_13_06">
           <front>
@@ -625,6 +652,7 @@ Decimal  Description                           References
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1925.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.5781.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.6480.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.7115.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8182.xml"/>
 
         <reference anchor="rpkitouch" target="https://www.github.com/job/rpkitouch">
