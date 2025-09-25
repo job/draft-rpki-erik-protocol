@@ -354,7 +354,7 @@ END]]>
             A manifest is nominally current until the time specified in nextUpdate or until a manifest is issued with a greater manifestNumber, whichever comes first (see <xref target="RFC9286" section="4.2.1"/>).
           </t>
           <t>
-            A <tt>ManifestRef</tt> is a 5-tuple consisting of the hash of the manifest object, the size of the manifest object, the manifest issuer's key identifier, the manifestNumber, and the thisUpdate contained within the object, and a sequence of <tt>AccessDescription</tt> instances from the manifest's End-Entity certificate's Subject Information Access extension.
+            A <tt>ManifestRef</tt> is a structure consisting of the hash of the manifest object, the size of the manifest object, the manifest issuer's key identifier, the manifestNumber, and the thisUpdate contained within the object, and a sequence of <tt>AccessDescription</tt> instances from the manifest's End-Entity certificate's Subject Information Access extension.
           </t>
           <t>
             Information elements are unique with respect to one another and sorted in ascending order of the hash.
