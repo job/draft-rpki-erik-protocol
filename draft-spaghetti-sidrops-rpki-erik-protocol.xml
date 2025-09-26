@@ -77,7 +77,7 @@ version="3">
         This document specifies the Erik Synchronization Protocol for use with the Resource Public Key Infrastructure (RPKI).
         Erik Synchronization can be characterized as a data replication system using Merkle trees, a content-addressable naming scheme, concurrency control using monotonically increasing sequence numbers, and HTTP transport.
         Relying Parties can combine information retrieved via Erik Synchronization with other RPKI transport protocols.
-        The protocol's design is intended to be efficient, fast, and easy to implement.
+        The protocol's design is intended to be efficient, fast, easy to implement, and robust in the face of partitions or faults in the network.
       </t>
     </abstract>
 
@@ -91,24 +91,27 @@ version="3">
         This document specifies the Erik Synchronization Protocol for use with the Resource Public Key Infrastructure (RPKI) <xref target="RFC6480"/>.
         Erik Synchronization can be characterized as a data replication system using Merkle Trees <xref target="M1987"/>, a content-addressable naming scheme <xref target="RFC6920"/>, concurrency control using monotonically increasing sequence numbers <xref target="RFC0677"/>, and HTTP transport <xref target="RFC9110"/>.
         Relying Parties can combine information retrieved via Erik Synchronization with other RPKI transport protocols (<xref target="RFC5781"/> and <xref target="RFC8182"/>).
-        The protocol's design is intended to be efficient, fast, and easy to implement <xref target="RFC1925"/>.
+        The protocol's design is intended to be efficient, fast, easy to implement <xref target="RFC1925"/>, and robust in the face of partitions or faults in the network.
       </t>
 
-      <t>
-        The notion of cache-to-cache data replication was documented in <xref target="RFC7115" section="3"/>.
-      </t>
-      <blockquote quotedFrom="RFC7115, section 3">
+      <section>
+        <name>Background</name>
         <t>
-           Validated caches may also be created and maintained from other validated caches.
-           Network operators SHOULD take maximum advantage of this feature to minimize load on the global distributed RPKI database.
-           Of course, the recipient relying parties should re-validate the data.
+          The notion of cache-to-cache data replication of unvalidated data was documented in <xref target="RFC7115" section="3"/>.
         </t>
-      </blockquote>
+        <blockquote quotedFrom="RFC7115, section 3">
+          <t>
+             Validated caches may also be created and maintained from other validated caches.
+             Network operators SHOULD take maximum advantage of this feature to minimize load on the global distributed RPKI database.
+             Of course, the recipient relying parties should re-validate the data.
+          </t>
+        </blockquote>
 
-      <t>
-        Historic records show that experiments have been performed in this space using, for example, peer-to-peer file sharing technology (see <xref target="P2P"/>), but no standardised and widely-deployed mechanism for cache-to-cache replication emerged since then.
-        The authors hope that the Erik Synchronization protocol might be suitable to fill this gap and help reduce load on the global RPKI.
-      </t>
+        <t>
+          Historic records show that experiments have been performed in this space using, for example, peer-to-peer file sharing technology (see <xref target="P2P"/>), but no standardised and widely-deployed mechanism for cache-to-cache replication emerged since then.
+          The authors hope that the Erik Synchronization protocol might be suitable to fill this gap and improve propagation speed of validly signed repository data as well as help reduce load on the global RPKI.
+        </t>
+      </section>
 
       <section anchor="reqs-lang">
         <name>Requirements Language</name>
@@ -124,7 +127,8 @@ version="3">
           "<xref target="RFC6480" format="title"/>" <xref target="RFC6480" format="default"/>,
           "<xref target="RFC8182" format="title"/>" <xref target="RFC8182" format="default"/>,
           "<xref target="RFC9286" format="title"/>" <xref target="RFC9286" format="default"/>,
-          and "<xref target="M1987" format="title"/>" <xref target="M1987" format="default"/>.
+          "<xref target="M1987" format="title"/>" <xref target="M1987" format="default"/>, and
+          "<xref target="Paxos" format="title"/>" <xref target="Paxos" format="default"/>.
         </t>
       </section>
 
@@ -148,7 +152,7 @@ version="3">
            <dd>A message digest calculated for an object using the SHA-256 algorithm.</dd>
 
            <dt>ErikIndex</dt>
-           <dd>An ordered listing of Partition identifiers and associated ErikPartition objects' hashes.</dd>
+           <dd>The relay's merkle root for a given FQDN. An ErikIndex is an ordered listing of Partition identifiers and associated ErikPartition objects' hashes.</dd>
 
            <dt>ErikPartition</dt>
            <dd>An ordered listing of the manifest objects' hashes, manifestNumber values, thisUpdate values, and their certificates' SIA extension values.</dd>
@@ -161,12 +165,17 @@ version="3">
     <section anchor="overview">
       <name>Informal Overview</name>
       <t>
-        In this synchronization protocol Merkle trees are used to determine whether differences exist between client and relay.
+        Erik Synchronisation is an architecture to reliably distribute RPKI repository data from cache to cache using so-called Erik relays.
+        Relays maintain a validated cache themselves and can be clients of other relays.
+        A group of relays can be understood by viewing its collective convergence as running an instance of a <xref target="Paxos"/> protocol.
+      </t>
+      <t>
+        In this synchronization protocol, Merkle trees are used to determine whether differences exist between client and relay.
         Merkle trees are hierarchical data structures: the hash value of each node is computed recursively by hashing the concatenated hash values of the node's children.
         The hash of the ErikIndex represents the entire dataset related to a given FQDN.
         If the ErikIndex hash is not the same between two replicas, the relay provides the client with hashes of smaller and smaller portions of the to-be-replicated dataset until the exact list of out-of-sync or missing objects is identified.
         Sequence numbers are then used to determine whether these differences are relevant enough for the client to fetch.
-        All data is fetched using addresses derived from hashes (except for ErikIndex objects).
+        All data, except for ErikIndex objects, is fetched using static addresses derived from object hashes.
         This approach reduces unnecessary data transfer between caches which contain mostly similar data.
       </t>
       <t>
@@ -395,17 +404,19 @@ END]]>
     <section anchor="rp">
       <name>Client-side Processing</name>
       <t>
-        A client can decide whether or not to fetch <tt>ErikIndex</tt> and <tt>ErikPartition</tt> objects, by comparing the hash to previous fetches.
+        A client can decide whether or not to fetch <tt>ErikPartition</tt> objects suggested by the relay.
+        For instance, by checking whether the object associated with the hash was already fetched at some point in the client's past.
       </t>
       <t>
         A client can decide whether or not to fetch a given manifest object, by comparing the <tt>manifestNumber</tt> and <tt>thisUpdate</tt> with what's locally cached and what's offered by the remote relay.
       </t>
       <t>
-        A client can compute which products listed in the manifest's <tt>fileList</tt> need to be fetched from the relay.
+        A client can compute which products listed in the manifest's <tt>fileList</tt> need to be fetched from one relay or another in order to achieve a successful fetch.
       </t>
       <t>
-        As there is no concept of 'sessions' (like in RRDP), clients can interchangably use different Erik relay.
+        As there is no concept of 'sessions' (like in RRDP), clients can interchangably use different Erik relays.
         When one Erik relay generates a HTTP error, the client can try fetching the requested object from another Erik relay.
+        To improve reliability, clients should alternate querying among different relays in successive fetch attempts.
       </t>
     </section>
 
@@ -425,10 +436,10 @@ END]]>
       </section>
       <section title="Fetching ErikIndex objects">
         <t>
-          The URIs to fetch ErikIndex objects can be constructed using the following Well-Known URI template with the <tt>erik</tt> keyword as suffix and the <tt>IndexScope</tt> as parameter: <tt>https://{relay_host}/.well-known/erik/head/{indexScope}</tt>.
+          The URIs to fetch ErikIndex objects can be constructed using the following Well-Known URI template with the <tt>erik</tt> keyword as suffix and the <tt>IndexScope</tt> as parameter: <tt>https://{relay_host}/.well-known/erik/index/{indexScope}</tt>.
         </t>
         <t>
-          For example, the URI to fetch an ErikIndex for the <tt>rpki.ripe.net</tt> <tt>indexScope</tt> from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/head/rpki.ripe.net</tt>.
+          For example, the URI to fetch an ErikIndex for the <tt>rpki.ripe.net</tt> <tt>indexScope</tt> from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/index/rpki.ripe.net</tt>.
         </t>
       </section>
     </section>
@@ -436,23 +447,24 @@ END]]>
     <section anchor="error">
       <name>Transport Error Detection and Handling</name>
       <t>
-        The client MUST calculate the hash of fetched objects and verify it is the same as the expected hash (which is embedded in the name through which the object was retrieved).
-        If there is a hash mismatch, the client may try fetching the object from a different Erik relay or treat this as a <em>failed fetch</em> (see <xref target="RFC9286" section="6.6"/>).
+        The client MUST calculate the hashes of fetched objects and verify they are the same as the expected hashes (which are embedded in the URIs through which the objects were retrieved).
+        If there is a hash mismatch, the client may try fetching the object from a different Erik relay or treat this as a <em>failed fetch</em> (see <xref target="RFC9286" section="6.6"/>) and try again at a later point in time in a next validation run.
       </t>
     </section>
 
     <section anchor="relay">
       <name>Setting Up an Erik Relay</name>
       <t>
-        Erik relays can be operated by third parties, without permission from or coordination with publication point operators or CAs.
+        Erik relays can be operated by any party, without permission from or coordination with publication point operators or CAs.
+        Relays are made accessible via either HTTP or HTTPS or both.
       </t>
       <t>
-        Relays generate ErikIndexes and ErikPartitions derived from their current validation state, the client then cherry-picks which objects (if any) it wishes to fetch.
-        Relays fetch fresh data from other relays or from CA-designated publication points.
+        Relays generate and make accessible ErikIndexes and ErikPartitions derived from their current validation state, the client then cherry-picks which objects (if any) it wishes to fetch.
+        In turn, relays fetch fresh data from other relays, or from CA-designated publication points accessible via Rsync (<xref target="RFC5781"/>) and RRDP (<xref target="RFC8182"/>).
       </t>
       <t>
         <em>
-          Design notes: a decision must be made a deterministic "manifest-to-partition" assignment scheme.
+          Design notes: a decision must be made on a deterministic "manifest-to-partition" assignment scheme.
           Job's proof-of-concept relay (see <xref target="running_code"/>) uses the first few octets of the the Manifest's AKI as a stable partition assignment scheme.
           Other strategies could be to assign manifests to ErikPartitions based on the "hour-of-day" of the CMS signing timestamp, or the first few octets of the SHA-256 of the manifest object.
         </em>
@@ -463,9 +475,9 @@ END]]>
       <name>Comparison with other RPKI transport protocols</name>
 
       <t>
-        Ignoring obvious "on the wire format" differences between Erik, Rsync, and RRDP; there are a number of key design differences between the protocols.
-        Rsync and RRDP can be described as "general purpose" synchronisation protocols, while the Erik protocol design is RPKI-specific.
-        In the Erik protocol, manifest objects (which RPs require for validation anyway) are an integral part of the signaling layer.
+        Ignoring obvious mechanical "on the wire" differences between Erik, Rsync, and RRDP; there are a number of concept differences between the protocols.
+        Rsync and RRDP can be described as "general purpose" synchronisation protocols: they could be used to transfer any arbitrary set of files, on the other hand the Erik protocol is RPKI-specific: part of its signaling layer are RPKI manifest objects, which RPs require as recourse for validation anyway.
+        This property by itself causes a small deduplication in the data to be transferered.
       </t>
 
       <section>
@@ -479,7 +491,7 @@ END]]>
           As of June 2025, in order to merely establish whether a client is synchronized or not with the RIPE NCC repository at <tt>rpki.ripe.net</tt>, as much as 5.8 megabytes of data are exchanged without exchanging any RPKI data.
         </t>
         <t>
-          When synchronizing once an hour, Rsync generally consumes less network traffic than RRDP.
+          Experimentation suggests that when synchronizing once an hour, Erik consumes less network traffic than Rsync generally would consume which, in turn, is less network traffic than RRDP would.
         </t>
       </section>
 
@@ -493,7 +505,7 @@ END]]>
           Imagine a hypothetical CA which issues and revokes a ROA every 10 minutes and a client that synchronizes every 60 minutes; in effect the client must fetch 5 outdated states, wasting bandwidth.
         </t>
         <t>
-          When synchronizing every 15 minutes, RRDP generally consumes less network traffic than Rsync.
+          Experimentation suggests that when synchronizing every 15 minutes, Erik consumes less network traffic than RRDP generally would consume which, in turn, is less network traffic than Rsync would consume.
         </t>
 
         <section>
@@ -534,7 +546,16 @@ END]]>
         This document makes no changes to RPKI certificate validation procedures.
       </t>
       <t>
+        Paraphrasing <xref target="RFC6810" section="11"/>:
+        The RPKI relies on object, not server or transport, trust.
+        That is, the Regional Internet Registry root trust anchors are distributed through some out-of-band means, and can then be used by each relying party to validate certificate chains and Signed Objects.
+        The inter-cache relationships are based on this object security model; hence, any cache-to-cache transport is assumed to be unreliable at times.
+      </t>
+      <t>
         See <xref target="RFC8182" section="5"/> for applicable security considerations.
+      </t>
+      <t>
+        Byzantine events or faults in relay-to-client communication can be resolved by the client rotating requests for objects among different Erik relays, using either HTTP or HTTPS.
       </t>
     </section>
 
@@ -589,6 +610,7 @@ Decimal  Description                           References
 -->
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.5280.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.6810.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.6920.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.7935.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml"/>
@@ -632,6 +654,17 @@ Decimal  Description                           References
             <author fullname="Leif Johansson" initials="L." surname="Johansson"/>
             <date year="2012" month="March"/>
           </front>
+        </reference>
+
+        <reference anchor="Paxos" quoteTitle="true" target="https://doi.org/10.1145/279227.279229" derivedAnchor="M1987">
+          <front>
+            <title>The part-time parliament</title>
+            <author fullname="Leslie Lamport" initials="L." surname="Lamport"/>
+            <date year="1998"/>
+          </front>
+          <refcontent>ACM Transactions on Computer Systems</refcontent>
+          <refcontent>Volume 16, Issue 2</refcontent>
+          <seriesInfo name="DOI" value="https://doi.org/10.1145/279227.279229"/>
         </reference>
 
 <!--
@@ -708,6 +741,9 @@ Decimal  Description                           References
 
         <dt><tt>http://nyc1.digitalocean.rpkiviews.org/</tt></dt>
         <dd>New York, USA, - single node</dd>
+
+        <dt><tt>http://fnllwqoupfrhso6643whm6lpkgsftjtc6crpehmyz2o7pffirnqy7rad.onion/</tt></dt>
+        <dd>Erik relay service via Tor</dd>
       </dl>
 
       <t>
