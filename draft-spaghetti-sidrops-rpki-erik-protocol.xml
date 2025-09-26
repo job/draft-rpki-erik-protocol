@@ -425,10 +425,10 @@ END]]>
       </section>
       <section title="Fetching ErikIndex objects">
         <t>
-          The URIs to fetch ErikIndex objects can be constructed using the following Well-Known URI template with the <tt>erik</tt> keyword as suffix and the <tt>IndexScope</tt> as parameter: <tt>https://{relay_host}/.well-known/erik/{indexScope}</tt>.
+          The URIs to fetch ErikIndex objects can be constructed using the following Well-Known URI template with the <tt>erik</tt> keyword as suffix and the <tt>IndexScope</tt> as parameter: <tt>https://{relay_host}/.well-known/erik/head/{indexScope}</tt>.
         </t>
         <t>
-          For example, the URI to fetch an ErikIndex for the <tt>rpki.ripe.net</tt> <tt>indexScope</tt> from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/rpki.ripe.net</tt>.
+          For example, the URI to fetch an ErikIndex for the <tt>rpki.ripe.net</tt> <tt>indexScope</tt> from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/head/rpki.ripe.net</tt>.
         </t>
       </section>
     </section>
