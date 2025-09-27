@@ -441,13 +441,13 @@ END]]>
       </section>
       <section title="Fetching ErikIndex objects">
         <t>
-          The URIs to fetch ErikIndex objects can be constructed using the following Well-Known URI template with the <tt>erik</tt> keyword as suffix and the <tt>IndexScope</tt> as parameter: <tt>https://{relay_host}/.well-known/erik/index/{indexScope}</tt>.
+          The URIs to fetch ErikIndex objects can be constructed using the following Well-Known URI template with the <tt>erik</tt> keyword as suffix and the <tt>FQDN</tt> as parameter: <tt>https://{relay_host}/.well-known/erik/index/{FQDN}</tt>.
         </t>
         <t>
-          For example, the URI to fetch an ErikIndex for the <tt>rpki.ripe.net</tt> <tt>indexScope</tt> from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/index/rpki.ripe.net</tt>.
+          For example, the URI to fetch an <tt>ErikIndex</tt> for the <tt>rpki.ripe.net</tt> FQDN from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/index/rpki.ripe.net</tt>.
         </t>
         <t>
-          A client <bcp14>MAY</bcp14> use the <tt>If-Modified-Since</tt> HTTP header when fetching ErikIndex objects.
+          A client <bcp14>MAY</bcp14> use the <tt>If-Modified-Since</tt> HTTP header when fetching <tt>ErikIndex</tt> objects.
         </t>
       </section>
     </section>
