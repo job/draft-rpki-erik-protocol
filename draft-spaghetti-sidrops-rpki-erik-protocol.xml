@@ -404,14 +404,19 @@ END]]>
     <section anchor="rp">
       <name>Client-side Processing</name>
       <t>
-        A client can decide whether or not to fetch <tt>ErikPartition</tt> objects suggested by the relay.
-        For instance, by checking whether the object associated with the hash was already fetched at some point in the client's past.
+        Clients start by fetching an <tt>ErikIndex</tt>, which is represents the relay's current merkle tree head for a given FQDN.
+        A client <bcp14>MUST</bcp14> verify the requested FQDN exactly matches the <tt>indexScope</tt> value in the <tt>ErikIndex</tt>, and if not proceed to use a different relay.
       </t>
       <t>
-        A client can decide whether or not to fetch a given manifest object, by comparing the <tt>manifestNumber</tt> and <tt>thisUpdate</tt> with what's locally cached and what's offered by the remote relay.
+        Then, clients can decide whether or not to fetch <tt>ErikPartition</tt> objects listed on the <tt>ErikIndex</tt>, for instance, by checking whether the object associated with the hash was already fetched at some point in the client's past.
+      </t>
+      <t>
+        Before using a <tt>ErikPartition</tt>, the client <bcp14>MUST</bcp14> verify that all URIs in the accessLocations in the id-ad-signedObject accessMethod instances in the <tt>ErikPartition</tt> are encompassed in the requested <tt>indexScope</tt>.
+        A client can then decide whether or not to fetch a given manifest object, by comparing the <tt>manifestNumber</tt> and <tt>thisUpdate</tt> with what's locally cached and what's offered by the remote relay.
       </t>
       <t>
         A client can compute which products listed in the manifest's <tt>fileList</tt> need to be fetched from one relay or another in order to achieve a successful fetch.
+        A client <bcp14>MUST</bcp14> verify that the URI in the accessLocation in one of the id-ad-signedObject accessMethod instances in the manifest's Subject Information Access (SIA) is encompassed in the requested <tt>indexScope</tt>.
       </t>
       <t>
         As there is no concept of 'sessions' (like in RRDP), clients can interchangably use different Erik relays.
@@ -440,6 +445,9 @@ END]]>
         </t>
         <t>
           For example, the URI to fetch an ErikIndex for the <tt>rpki.ripe.net</tt> <tt>indexScope</tt> from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/index/rpki.ripe.net</tt>.
+        </t>
+        <t>
+          A client <bcp14>MAY</bcp14> use the <tt>If-Modified-Since</tt> HTTP header when fetching ErikIndex objects.
         </t>
       </section>
     </section>
@@ -550,9 +558,10 @@ END]]>
         The RPKI relies on object, not server or transport, trust.
         That is, the Regional Internet Registry root trust anchors are distributed through some out-of-band means, and can then be used by each relying party to validate certificate chains and Signed Objects.
         The inter-cache relationships are based on this object security model; hence, any cache-to-cache transport is assumed to be unreliable at times.
+        See <xref target="RFC8182" section="5"/> for more security considerations.
       </t>
       <t>
-        See <xref target="RFC8182" section="5"/> for applicable security considerations.
+        To avoid certain forms of replay attack, clients <bcp14>MUST</bcp14> verify purported <tt>indexScope</tt>, <tt>ManifestRef</tt> location values, and manifest Subject Information Access (SIA) extensions match the expected FQDN.
       </t>
       <t>
         Byzantine events or faults in relay-to-client communication can be overcome by the client rotating requests for objects among different Erik relays.
