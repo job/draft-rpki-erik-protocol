@@ -568,17 +568,31 @@ END]]>
         </t>
         <artwork>
 <![CDATA[
-Decimal  Description                           References
---------------------------------------------------------------
-    TDB  id-mod-rpkiErikSynchronization-2025   [this-draft]
+Decimal  Description                          References
+-----------------------------------------------------------
+  TDB    id-mod-rpkiErikSynchronization-2025  [this-draft]
 ]]>
         </artwork>
       </section>
 
-      <section title="OIDs for Content Types">
+      <section title="SMI Security for S/MIME CMS Content Type (1.2.840.113549.1.9.16.1)">
         <t>
-          For the current proof-of-concept phase the <tt>id-ct-rpkiErikIndex</tt> and <tt>id-ct-rpkiErikPartition</tt> OIDs were assigned from a PEN arc.
-          This section will be updated once it is clear which IANA-managed registries would be best suited for OID assignment for these object identifiers.
+          The IANA is requested to allocate for this document in the "SMI Security for S/MIME CMS Content Type (1.2.840.113549.1.9.16.1)" registry:
+        </t>
+        <artwork>
+<![CDATA[
+Decimal  Description              References
+----------------------------------------------
+  TBD    id-ct-rpkiErikIndex      [this-draft]
+  TBD    id-ct-rpkiErikPartition  [this-draft]
+]]>
+        </artwork>
+        <t>
+          Upon publication of this document, IANA is requested to reference the RFC publication instead of this draft.
+        </t>
+        <t>
+          For the current proof-of-concept phase, OIDs for <tt>id-ct-rpkiErikIndex</tt> and <tt>id-ct-rpkiErikPartition</tt> were assigned from a PEN arc.
+          Implementers are not expected to make any special accommodations to retain backwards compatibility with these PEN OIDs, after IANA assigns OIDs.
         </t>
       </section>
 
