@@ -167,7 +167,7 @@ version="3">
       <t>
         Erik Synchronisation is an architecture to reliably distribute RPKI repository data from cache to cache using so-called Erik relays.
         Relays maintain a validated cache themselves and can be clients of other relays.
-        The collective convergence of a group of relays can be interpreted as an instance of a <xref target="Paxos"/> protocol.
+        The collective convergence of a group of relays can be interpreted as an instance of a <xref target="Paxos"/> protocol variant.
       </t>
       <t>
         In this synchronization protocol, Merkle trees are used to determine whether differences exist between client and relay.
@@ -742,7 +742,7 @@ Decimal  Description                           References
         <dt><tt>http://miso.sobornost.net/</tt></dt>
         <dd>Amsterdam, NL, single node</dd>
 
-        <dt><tt>http://nyc1.digitalocean.rpkiviews.org/</tt></dt>
+        <dt><tt>http://nyc.rpki-servers.org/</tt></dt>
         <dd>New York, USA, - single node</dd>
 
         <dt><tt>http://fnllwqoupfrhso6643whm6lpkgsftjtc6crpehmyz2o7pffirnqy7rad.onion/</tt></dt>
