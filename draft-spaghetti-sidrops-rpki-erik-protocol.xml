@@ -127,8 +127,7 @@ version="3">
           "<xref target="RFC6480" format="title"/>" <xref target="RFC6480" format="default"/>,
           "<xref target="RFC8182" format="title"/>" <xref target="RFC8182" format="default"/>,
           "<xref target="RFC9286" format="title"/>" <xref target="RFC9286" format="default"/>,
-          "<xref target="M1987" format="title"/>" <xref target="M1987" format="default"/>, and
-          "<xref target="Paxos" format="title"/>" <xref target="Paxos" format="default"/>.
+          "<xref target="M1987" format="title"/>" <xref target="M1987" format="default"/>.
         </t>
       </section>
 
@@ -167,7 +166,7 @@ version="3">
       <t>
         Erik Synchronisation is an architecture to reliably distribute RPKI repository data from cache to cache using so-called Erik relays.
         Relays maintain a validated cache themselves and can be clients of other relays.
-        The collective convergence of a group of relays can be interpreted as an instance of a <xref target="Paxos"/> protocol variant.
+        While this property suggests that a group of relays should converge to the exact same state, the distributed nature of the RPKI prevents relays from achieving strict synchronization.
       </t>
       <t>
         In this synchronization protocol, Merkle trees are used to determine whether differences exist between client and relay.
@@ -677,17 +676,6 @@ Decimal  Description              References
             <author fullname="Leif Johansson" initials="L." surname="Johansson"/>
             <date year="2012" month="March"/>
           </front>
-        </reference>
-
-        <reference anchor="Paxos" quoteTitle="true" target="https://doi.org/10.1145/279227.279229" derivedAnchor="M1987">
-          <front>
-            <title>The part-time parliament</title>
-            <author fullname="Leslie Lamport" initials="L." surname="Lamport"/>
-            <date year="1998"/>
-          </front>
-          <refcontent>ACM Transactions on Computer Systems</refcontent>
-          <refcontent>Volume 16, Issue 2</refcontent>
-          <seriesInfo name="DOI" value="https://doi.org/10.1145/279227.279229"/>
         </reference>
 
 <!--
