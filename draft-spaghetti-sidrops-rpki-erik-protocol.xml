@@ -421,7 +421,7 @@ END]]>
       <t>
         As there is no concept of 'sessions' (like in RRDP), clients can interchangably use different Erik relays.
         When one Erik relay generates a HTTP error, the client can try fetching the requested object from another Erik relay.
-        To improve reliability, clients should alternate querying among different relays in successive fetch attempts.
+        To improve reliability, clients should alternate among different relays in successive query and fetch attempts.
       </t>
     </section>
 
