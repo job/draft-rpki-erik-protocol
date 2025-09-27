@@ -555,7 +555,7 @@ END]]>
         See <xref target="RFC8182" section="5"/> for applicable security considerations.
       </t>
       <t>
-        Byzantine events or faults in relay-to-client communication can be resolved by the client rotating requests for objects among different Erik relays, using either HTTP or HTTPS.
+        Byzantine events or faults in relay-to-client communication can be overcome by the client rotating requests for objects among different Erik relays.
       </t>
     </section>
 
