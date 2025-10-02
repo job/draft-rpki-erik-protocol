@@ -206,6 +206,8 @@ RpkiErikSynchronization-2025
 DEFINITIONS EXPLICIT TAGS ::=
 BEGIN
 
+-- EXPORTS ALL --
+
 IMPORTS
   CONTENT-TYPE, Digest, DigestAlgorithmIdentifier
   FROM CryptographicMessageSyntax-2010 -- in [RFC6268]
