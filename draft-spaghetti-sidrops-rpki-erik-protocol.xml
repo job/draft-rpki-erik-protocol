@@ -89,7 +89,7 @@ version="3">
       <name>Introduction</name>
       <t>
         This document specifies the Erik Synchronization Protocol for use with the Resource Public Key Infrastructure (RPKI) <xref target="RFC6480"/>.
-        Erik Synchronization can be characterized as a data replication system using Merkle Trees <xref target="M1987"/>, a content-addressable naming scheme <xref target="RFC6920"/>, concurrency control using monotonically increasing sequence numbers <xref target="RFC0677"/>, and HTTP transport <xref target="RFC9110"/>.
+        Erik Synchronization can be characterized as a data replication system using Merkle trees <xref target="M1987"/>, a content-addressable naming scheme <xref target="RFC6920"/>, concurrency control using monotonically increasing sequence numbers <xref target="RFC0677"/>, and HTTP transport <xref target="RFC9110"/>.
         Relying Parties can combine information retrieved via Erik Synchronization with other RPKI transport protocols (<xref target="RFC5781"/> and <xref target="RFC8182"/>).
         The protocol's design is intended to be efficient, fast, easy to implement <xref target="RFC1925"/>, and robust in the face of partitions or faults in the network.
       </t>
@@ -151,7 +151,7 @@ version="3">
            <dd>A message digest calculated for an object using the SHA-256 algorithm.</dd>
 
            <dt>ErikIndex</dt>
-           <dd>The relay's merkle root for a given FQDN. An ErikIndex is an ordered listing of Partition identifiers and associated ErikPartition objects' hashes.</dd>
+           <dd>The relay's Merkle root for a given FQDN. An ErikIndex is an ordered listing of Partition identifiers and associated ErikPartition objects' hashes.</dd>
 
            <dt>ErikPartition</dt>
            <dd>An ordered listing of the manifest objects' hashes, manifestNumber values, thisUpdate values, and their certificates' SIA extension values.</dd>
@@ -180,7 +180,7 @@ version="3">
       <t>
         The client starts by querying an Erik relay for the relay's current ErikIndex for a given FQDN.
         If the ErikIndex is different compared to the previous run (or compared to the Index calculated from the locally cached objects).
-        With the ErikIndex in hand, the client can determine which ErikParitions are missing and fetch accordingly.
+        With the ErikIndex in hand, the client can determine which ErikPartition are missing and fetch accordingly.
         The client then can compare the <em>manifestNumber</em> sequence number and <em>thisUpdate</em> for each manifest listed in the ErikPartition, and proceed to fetch (purportedly) newer versions of manifests of interest.
         Whenever a relay has manifests with a lower sequence number on offer, the client can ignore those.
         The client now has sufficient information to proceed to fetch any missing Certificates, Signed objects, and CRLs.
@@ -194,7 +194,7 @@ version="3">
         In this synchronization protocol the <em>signal layer</em> makes use of DER-encoded messages <xref target="X.690"/>.
       </t>
       <t>
-        <em>Design note: DER encoding was selected for its canonical properities and because RPKI cache implementations already support ASN.1 encoding.</em>
+        <em>Design note: DER encoding was selected for its canonical properties and because RPKI cache implementations already support ASN.1 encoding.</em>
       </t>
 <sourcecode type="asn.1" markers="false">
 <![CDATA[
@@ -405,7 +405,7 @@ END]]>
     <section anchor="rp">
       <name>Client-side Processing</name>
       <t>
-        Clients start by fetching an <tt>ErikIndex</tt>, which is represents the relay's current merkle tree head for a given FQDN.
+        Clients start by fetching an <tt>ErikIndex</tt>, which is represents the relay's current Merkle tree head for a given FQDN.
         A client <bcp14>MUST</bcp14> verify the requested FQDN exactly matches the <tt>indexScope</tt> value in the <tt>ErikIndex</tt>, and if not proceed to use a different relay.
       </t>
       <t>
@@ -420,7 +420,7 @@ END]]>
         A client <bcp14>MUST</bcp14> verify that the URI in the accessLocation in one of the id-ad-signedObject accessMethod instances in the manifest's Subject Information Access (SIA) is encompassed in the requested <tt>indexScope</tt>.
       </t>
       <t>
-        As there is no concept of 'sessions' (like in RRDP), clients can interchangably use different Erik relays.
+        As there is no concept of 'sessions' (like in RRDP), clients can interchangeably use different Erik relays.
         When one Erik relay generates a HTTP error, the client can try fetching the requested object from another Erik relay.
         To improve reliability, clients should alternate among different relays in successive query and fetch attempts.
       </t>
@@ -486,7 +486,7 @@ END]]>
       <t>
         Ignoring obvious mechanical "on the wire" differences between Erik, Rsync, and RRDP; there are a number of concept differences between the protocols.
         Rsync and RRDP can be described as "general purpose" synchronisation protocols: they could be used to transfer any arbitrary set of files, on the other hand the Erik protocol is RPKI-specific: part of its signaling layer are RPKI manifest objects, which RPs require as recourse for validation anyway.
-        This property by itself causes a small deduplication in the data to be transferered.
+        This property by itself causes a small deduplication in the data to be transferred.
       </t>
 
       <section>
@@ -535,7 +535,7 @@ END]]>
          <li>Which of the possible deterministic manifest-to-partition assignment strategies yield the best results? AKI?</li>
          <li>Are deterministic and cheap Snapshots possible? If so, what is the best archive format for Snapshots? The ustar/gzip combo might not easily yield deterministic results across different implementations.</li>
          <li>Is the concept of Differentials/Deltas needed in Erik Synchronization?</li>
-         <li>What will be the upperbound for the number of partitions? (<tt>ub-Partitions</tt>)</li>
+         <li>What will be the upper bound for the number of partitions? (<tt>ub-Partitions</tt>)</li>
        </ul>
     </section>
 
@@ -671,7 +671,7 @@ Decimal  Description              References
 
         <reference anchor="P2P" target="https://www.ietf.org/proceedings/83/slides/slides-83-sidr-9.pdf">
           <front>
-            <title>RPKI Over Bittorrent</title>
+            <title>RPKI Over BitTorrent</title>
             <author fullname="Rob Austein" initials="R." surname="Austein"/>
             <author fullname="Randy Bush" initials="R." surname="Bush"/>
             <author fullname="Michael Elkins" initials="M." surname="Elkins"/>
@@ -744,7 +744,7 @@ Decimal  Description              References
       </t>
       <dl>
         <dt><tt>http://relay.rpki-servers.org/</tt></dt>
-        <dd>Dublin, Montreal, Osaka, Sao Paolo, Sydney - anycasted distributed computing cluster</dd>
+        <dd>Dublin, Montreal, Osaka, S&#227;o Paulo, Sydney - anycasted distributed computing cluster</dd>
 
         <dt><tt>http://dub.rpki-servers.org/</tt></dt>
         <dd>Dublin, Ireland, - distributed computing cluster (6 machines, NFS backend)</dd>
