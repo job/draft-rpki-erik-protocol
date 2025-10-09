@@ -218,6 +218,14 @@ IMPORTS
     mechanisms(5) pkix(7) id-mod(0) id-pkix1-implicit(19) }
 ;
 
+EncapsulatedContentInfo ::= SEQUENCE {
+  eContentType     CONTENT-TYPE.&id({ContentSet}),
+  eContent         [0] EXPLICIT OCTET STRING
+    (CONTAINING CONTENT-TYPE.&Type({ContentSet}{@eContentType})) OPTIONAL }
+
+ContentSet CONTENT-TYPE ::= {
+  ct-rpkiErikIndex | ct-rpkiErikPartition, ... }
+
 ct-rpkiErikIndex CONTENT-TYPE ::=
   { TYPE ErikIndex IDENTIFIED BY id-ct-rpkiErikIndex }
 
@@ -261,6 +269,25 @@ ManifestRef ::= SEQUENCE {
   location         SEQUENCE SIZE (1..MAX) OF AccessDescription }
 END]]>
 </sourcecode>
+
+      <section anchor="genstructure">
+        <name>General Syntax</name>
+        <t>
+          The content of an Erik object is an instance of <tt>EncapsulatedContentInfo</tt>.
+        </t>
+        <section>
+          <name>eContentType</name>
+          <t>
+            The <tt>eContentType</tt> is an OID specifying the type of payload in this object.
+          </t>
+        </section>
+        <section>
+          <name>eContent</name>
+          <t>
+            The eContent is the payload of the Erik object encapsulated in an OCTET STRING.
+          </t>
+        </section>
+      </section>
 
       <section anchor="asn1-index">
         <name>ErikIndex</name>
@@ -795,8 +822,10 @@ Decimal  Description              References
         The authors wish to thank
           <contact fullname="George Michaelson"/>,
           <contact fullname="Theo de Raadt"/>,
-          <contact fullname="Bob Beck"/>, and
-          <contact fullname="Theo Buehler"/>
+          <contact fullname="Bob Beck"/>,
+          <contact fullname="Theo Buehler"/>,
+          and
+          <contact fullname="William McCall"/>
         for the lovely conversations that led to this proposal.
       </t>
       <t>
