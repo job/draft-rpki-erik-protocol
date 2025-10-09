@@ -20,4 +20,4 @@ upload: $(NAME).html
 	scp $(NAME).html $(NAME).txt chloe.sobornost.net:www
 
 clean:
-	rm -f *.html *.txt
+	rm -f *.html *.txt *.exp.xml
