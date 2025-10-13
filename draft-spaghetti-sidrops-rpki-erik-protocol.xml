@@ -568,12 +568,26 @@ END]]>
 
     <section anchor="operational">
       <name>Operational Considerations</name>
-      <t>
-        As of July 2025, the global Internet's RPKI churn rate appears to be 2 new objects per second.
-        The ecosystem is estimated to be composed of ~ 5000 RPKI cache instances and ~ 50 repository servers.
-        Assuming 10 minute fetching intervals and 150 metadata requests per synchronization run (for exchange of Merkle tree data), an Erik relay serving all the Internet's RPKI cache instances would probably need to be able to sustain serving an average of at least 11,000 HTTP requests per second.
-        This order of magnitude in terms of scaling requirements can easily be handled by a single commodity server.
-      </t>
+      <section>
+        <name>Scaling considerations</name>
+        <t>
+          As of July 2025, the global Internet's RPKI churn rate appears to be 2 new objects per second.
+          The ecosystem is estimated to be composed of ~ 5000 RPKI cache instances and ~ 50 repository servers.
+          Assuming 10 minute fetching intervals and 150 metadata requests per synchronization run (for exchange of Merkle tree data), an Erik relay serving all the Internet's RPKI cache instances would probably need to be able to sustain serving an average of at least 11,000 HTTP requests per second.
+          This order of magnitude in terms of scaling requirements can easily be handled by a single commodity server.
+        </t>
+      </section>
+      <section>
+        <name>HTTP Compression</name>
+        <t>
+          Using gzip compression on average tends to yield a 20% reduction in RPKI object size, therefore it is <bcp14>RECOMMENDED</bcp14> for clients and relays to offer support for compressed content coding, as described in <xref target="RFC9110" section="8.4.1"/>.
+        </t>
+        <t>
+          Using a previous version of a RPKI object as a compression dictionary for a newer version enables delivery of a delta-compressed version of the changes, usually resulting in significantly smaller responses than what can be achieved by compression alone.
+          Clients can facilitate delta compression by sending an <tt>Available-Dictionary</tt> request header, using a previously fetched version of the RPKI object as the dictionary.
+          It is <bcp14>RECOMMENDED</bcp14> for clients and relays to make use of Compression Dictionary Transport (<xref target="RFC9842"/>).
+        </t>
+      </section>
     </section>
 
     <section anchor="security">
@@ -727,6 +741,7 @@ Decimal  Description              References
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.6480.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.7115.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8182.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.9842.xml"/>
 
         <reference anchor="rpkitouch" target="https://www.github.com/job/rpkitouch">
           <front>
