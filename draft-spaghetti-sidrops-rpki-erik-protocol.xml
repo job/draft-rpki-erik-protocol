@@ -26,12 +26,14 @@ version="3">
     </title>
 
     <author fullname="Job Snijders" initials="J." surname="Snijders">
-      <organization />
+      <organization abbrev="BSD">BSD Software Development</organization>
       <address>
         <postal>
+          <postalLine>Amsterdam</postalLine>
           <postalLine>The Netherlands</postalLine>
         </postal>
-        <email>job@sobornost.net</email>
+        <email>job@bsd.nl</email>
+        <uri>https://wwww.bsd.nl/</uri>
       </address>
     </author>
 
