@@ -217,9 +217,9 @@ IMPORTS
     pkcs-9(9) smime(16) modules(0) id-mod-cms-2009(58) }
 
   AccessDescription, KeyIdentifier
-  FROM PKIX1Implicit88 -- in [RFC5280]
+  FROM PKIX1Implicit-2009 -- in [RFC5912]
   { iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) id-mod(0) id-pkix1-implicit(19) }
+    mechanisms(5) pkix(7) id-mod(0) id-mod-pkix1-implicit-02(59) }
 ;
 
 EncapsulatedContentInfo ::= SEQUENCE {
@@ -846,6 +846,7 @@ Decimal  Description              References
           and
           <contact fullname="William McCall"/>
         for the lovely conversations that led to this proposal.
+        The authors wish to thank <contact fullname="Sean Turner"/> and <contact fullname="Russ Housley"/> for their help with ASN.1.
       </t>
       <t>
         This protocol is named after Erik Bais, who passed away in 2024, as a small token of appreciation for his friendship.
