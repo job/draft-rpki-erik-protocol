@@ -244,7 +244,7 @@ ErikIndex ::= SEQUENCE {
   hashAlg          DigestAlgorithmIdentifier,
   partitionList    SEQUENCE SIZE (1..ub-Partitions) OF PartitionRef }
 
-ub-Partitions INTEGER ::= 1024
+ub-Partitions INTEGER ::= 256
 
 PartitionRef ::= SEQUENCE {
   identifier       INTEGER (1..ub-Partitions),
