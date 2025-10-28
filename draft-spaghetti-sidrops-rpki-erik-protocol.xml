@@ -153,7 +153,7 @@ version="3">
            <dd>A message digest calculated for an object using the SHA-256 algorithm.</dd>
 
            <dt>ErikIndex</dt>
-           <dd>The relay's Merkle root for a given FQDN. An ErikIndex is an ordered listing of Partition identifiers and associated ErikPartition objects' hashes.</dd>
+           <dd>The relay's Merkle root for a given FQDN. An ErikIndex is an ordered listing of ErikPartition object hashes.</dd>
 
            <dt>ErikPartition</dt>
            <dd>An ordered listing of the manifest objects' hashes, manifestNumber values, thisUpdate values, and their certificates' SIA extension values.</dd>
@@ -247,7 +247,6 @@ ErikIndex ::= SEQUENCE {
 ub-Partitions INTEGER ::= 256
 
 PartitionRef ::= SEQUENCE {
-  identifier       INTEGER (1..ub-Partitions),
   hash             Digest,
   size             INTEGER (100..MAX) }
 
@@ -340,10 +339,10 @@ END]]>
           <t>
             This field is a sequence of <tt>PartitionRef</tt> instances.
             There is one <tt>PartitionRef</tt> for each current ErikPartition.
-            Each <tt>PartitionRef</tt> is a 3-tuple consisting of the partition identifier, the hash of the partition object, and the size of the partition object.
+            Each <tt>PartitionRef</tt> is a tuple consisting of the hash of the partition object and the size of the partition object.
           </t>
           <t>
-            Information elements are unique with respect to one another and sorted in ascending order of the partition identifier.
+            Information elements are unique with respect to one another and sorted in ascending order of the hash.
           </t>
         </section>
 
