@@ -9,7 +9,7 @@
 
 <rfc xmlns:xi="http://www.w3.org/2001/XInclude"
 category="std"
-docName="draft-spaghetti-sidrops-rpki-erik-protocol-04"
+docName="draft-ietf-sidrops-rpki-erik-protocol-00"
 ipr="trust200902"
 xml:lang="en"
 sortRefs="true"
@@ -828,9 +828,9 @@ Decimal  Description              References
       <section>
         <name>Example ErikPartition</name>
         <t>
-          This object was retrieved from <tt>http://miso.sobornost.net/.well-known/ni/sha-256/c2zSaUVzFAW7XY7BDGXzGvjLR0xlRmo2gD_FuC70mGQ</tt>.
+          This object was retrieved from <tt>http://miso.sobornost.net/.well-known/ni/sha-256/0TiOztqYAfrgD3weWzOyF5RM-8AcLzrnQlwJXRsrSys</tt>.
         </t>
-        <sourcecode anchor="ex_part" type="base64" src="2pDsBLWvKLanIIl3WilFJgitQZGNS7E4CzdyUDtv0W4.b64"/>
+        <sourcecode anchor="ex_part" type="base64" src="0TiOztqYAfrgD3weWzOyF5RM-8AcLzrnQlwJXRsrSys.b64"/>
       </section>
     </section>
 
@@ -845,7 +845,7 @@ Decimal  Description              References
           and
           <contact fullname="William McCall"/>
         for the lovely conversations that led to this proposal.
-        The authors wish to thank <contact fullname="Sean Turner"/> and <contact fullname="Russ Housley"/> for their help with ASN.1.
+        The authors wish to thank <contact fullname="Sean Turner"/> and <contact fullname="Russ Housley"/> for their review of the ASN.1 notation.
       </t>
       <t>
         This protocol is named after Erik Bais, who passed away in 2024, as a small token of appreciation for his friendship.
