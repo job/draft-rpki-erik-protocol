@@ -235,8 +235,15 @@ ct-rpkiErikIndex CONTENT-TYPE ::=
   { TYPE ErikIndex IDENTIFIED BY id-ct-rpkiErikIndex }
 
 id-ct-rpkiErikIndex OBJECT IDENTIFIER ::=
-  { iso(1) identified-organization(3) dod(6) internet(1) private(4)
-    enterprise(1) snijders(41948) erikindex(826) }
+  { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+    pkcs-9(9) id-smime(16) id-ct(1) erikindex(55) }
+
+ct-rpkiErikPartition CONTENT-TYPE ::=
+  { TYPE ErikPartition IDENTIFIED BY id-ct-rpkiErikPartition }
+
+id-ct-rpkiErikPartition OBJECT IDENTIFIER ::=
+  { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+    pkcs-9(9) id-smime(16) id-ct(1) erikpartition(56) }
 
 ErikIndex ::= SEQUENCE {
   version [0]      INTEGER DEFAULT 0,
@@ -250,13 +257,6 @@ ub-Partitions INTEGER ::= 256
 PartitionRef ::= SEQUENCE {
   hash             Digest,
   size             INTEGER (100..MAX) }
-
-ct-rpkiErikPartition CONTENT-TYPE ::=
-  { TYPE ErikPartition IDENTIFIED BY id-ct-rpkiErikPartition }
-
-id-ct-rpkiErikPartition OBJECT IDENTIFIER ::=
-  { iso(1) identified-organization(3) dod(6) internet(1) private(4)
-    enterprise(1) snijders(41948) erikpartition(827) }
 
 ErikPartition ::= SEQUENCE {
   version [0]      INTEGER DEFAULT 0,
@@ -288,7 +288,7 @@ END]]>
         <section>
           <name>eContent</name>
           <t>
-            The eContent is the payload of the Erik object encapsulated in an OCTET STRING.
+            The eContent is the payload of the Erik object encapsulated in an <tt>OCTET STRING</tt>.
           </t>
         </section>
       </section>
@@ -630,22 +630,18 @@ Decimal  Description                          References
 
       <section title="SMI Security for S/MIME CMS Content Type (1.2.840.113549.1.9.16.1)">
         <t>
-          The IANA is requested to allocate for this document in the "SMI Security for S/MIME CMS Content Type (1.2.840.113549.1.9.16.1)" registry:
+          The IANA has allocated for this specification in the "SMI Security for S/MIME CMS Content Type (1.2.840.113549.1.9.16.1)" registry as follows:
         </t>
         <artwork>
 <![CDATA[
 Decimal  Description              References
 ----------------------------------------------
-  TBD    id-ct-rpkiErikIndex      [this-draft]
-  TBD    id-ct-rpkiErikPartition  [this-draft]
+   55    id-ct-rpkiErikIndex      [this-draft]
+   56    id-ct-rpkiErikPartition  [this-draft]
 ]]>
         </artwork>
         <t>
           Upon publication of this document, IANA is requested to reference the RFC publication instead of this draft.
-        </t>
-        <t>
-          For the current proof-of-concept phase, OIDs for <tt>id-ct-rpkiErikIndex</tt> and <tt>id-ct-rpkiErikPartition</tt> were assigned from a PEN arc.
-          Implementers are not expected to make any special accommodations to retain backwards compatibility with these PEN OIDs, after IANA assigns OIDs.
         </t>
       </section>
 
@@ -829,9 +825,9 @@ Decimal  Description              References
       <section>
         <name>Example ErikPartition</name>
         <t>
-          This object was retrieved from <tt>http://miso.sobornost.net/.well-known/ni/sha-256/0TiOztqYAfrgD3weWzOyF5RM-8AcLzrnQlwJXRsrSys</tt>.
+          This object was retrieved from <tt>http://miso.sobornost.net/.well-known/ni/sha-256/tt4hiX0Qy_Z8DVemvLOiDfDXrt2kRDrWRFHFB9aDUgA</tt>.
         </t>
-        <sourcecode anchor="ex_part" type="base64" src="0TiOztqYAfrgD3weWzOyF5RM-8AcLzrnQlwJXRsrSys.b64"/>
+        <sourcecode anchor="ex_part" type="base64" src="tt4hiX0Qy_Z8DVemvLOiDfDXrt2kRDrWRFHFB9aDUgA.b64"/>
       </section>
     </section>
 
