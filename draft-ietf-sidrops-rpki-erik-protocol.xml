@@ -222,11 +222,10 @@ IMPORTS
     mechanisms(5) pkix(7) id-mod(0) id-mod-pkix1-implicit-02(59) }
 ;
 
-EncapsulatedContentInfo ::= SEQUENCE {
-  eContentType     CONTENT-TYPE.&id({ContentSet}),
-  eContent         [0] EXPLICIT OCTET STRING
-    (CONTAINING CONTENT-TYPE.&Type({ContentSet}{@eContentType}))
-    OPTIONAL }
+ContentInfo ::= SEQUENCE {
+  contentType      CONTENT-TYPE.&id({ContentSet}),
+  content      [0] EXPLICIT
+                     CONTENT-TYPE.&Type({ContentSet}{@contentType}) }
 
 ContentSet CONTENT-TYPE ::= {
   ct-rpkiErikIndex | ct-rpkiErikPartition, ... }
@@ -277,18 +276,18 @@ END]]>
       <section anchor="genstructure">
         <name>General Syntax</name>
         <t>
-          The content of an Erik object is an instance of <tt>EncapsulatedContentInfo</tt>.
+          At the top level the content of an Erik object is an instance of <tt>ContentInfo</tt>.
         </t>
         <section>
-          <name>eContentType</name>
+          <name>contentType</name>
           <t>
-            The <tt>eContentType</tt> is an OID specifying the type of payload in this object.
+            The <tt>contentType</tt> is an OID specifying the type of payload in the object, in this profile either <tt>id-ct-rpkiErikIndex</tt> or <tt>id-ct-rpkiErikPartition</tt>.
           </t>
         </section>
         <section>
-          <name>eContent</name>
+          <name>content</name>
           <t>
-            The eContent is the payload of the Erik object encapsulated in an <tt>OCTET STRING</tt>.
+            The <tt>content</tt> field contains an instance of <tt>ErikIndex</tt> or <tt>ErikPartition</tt>.
           </t>
         </section>
       </section>
@@ -817,7 +816,7 @@ Decimal  Description              References
       <section>
         <name>Example ErikIndex</name>
         <t>
-          This object was retrieved from <tt>http://miso.sobornost.net/.well-known/erik/rpki.ripe.net</tt>.
+          This object was retrieved from <tt>http://miso.sobornost.net/.well-known/erik/index/rpki.ripe.net</tt>.
         </t>
         <sourcecode anchor="ex_index" type="base64" src="rpki.ripe.net.b64"/>
       </section>
@@ -825,9 +824,9 @@ Decimal  Description              References
       <section>
         <name>Example ErikPartition</name>
         <t>
-          This object was retrieved from <tt>http://miso.sobornost.net/.well-known/ni/sha-256/tt4hiX0Qy_Z8DVemvLOiDfDXrt2kRDrWRFHFB9aDUgA</tt>.
+          This object was retrieved from <tt>http://miso.sobornost.net/.well-known/ni/sha-256/_i_E-1WInRt8y8b7PA5x4uU1mJi6GyypwX0N8N0YNG0</tt>.
         </t>
-        <sourcecode anchor="ex_part" type="base64" src="tt4hiX0Qy_Z8DVemvLOiDfDXrt2kRDrWRFHFB9aDUgA.b64"/>
+        <sourcecode anchor="ex_part" type="base64" src="_i_E-1WInRt8y8b7PA5x4uU1mJi6GyypwX0N8N0YNG0.b64"/>
       </section>
     </section>
 
