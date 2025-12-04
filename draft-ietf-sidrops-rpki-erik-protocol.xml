@@ -249,7 +249,8 @@ ErikIndex ::= SEQUENCE {
   indexScope       IA5String,
   indexTime        GeneralizedTime,
   hashAlg          DigestAlgorithmIdentifier,
-  partitionList    SEQUENCE SIZE (1..ub-Partitions) OF PartitionRef }
+  partitionList    SEQUENCE (SIZE(1..ub-Partitions)) OF PartitionRef
+}
 
 ub-Partitions INTEGER ::= 256
 
@@ -261,7 +262,7 @@ ErikPartition ::= SEQUENCE {
   version [0]      INTEGER DEFAULT 0,
   partitionTime    GeneralizedTime,
   hashAlg          DigestAlgorithmIdentifier,
-  manifestList     SEQUENCE SIZE (1..MAX) OF ManifestRef }
+  manifestList     SEQUENCE (SIZE(1..MAX)) OF ManifestRef }
 
 ManifestRef ::= SEQUENCE {
   hash             Digest,
@@ -269,7 +270,7 @@ ManifestRef ::= SEQUENCE {
   aki              KeyIdentifier,
   manifestNumber   INTEGER (0..MAX),
   thisUpdate       GeneralizedTime,
-  locations        SEQUENCE SIZE (1..MAX) OF AccessDescription }
+  locations        SEQUENCE (SIZE(1..MAX)) OF AccessDescription }
 END]]>
 </sourcecode>
 
