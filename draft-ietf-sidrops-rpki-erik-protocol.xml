@@ -909,9 +909,9 @@ $ gzcat rpki.ripe.net | openssl asn1parse -inform DER | grep -c :d=0
 $ cd /var/cache/rpki-client/
 $ export TMP="$(mktemp)"
 $ find * -mmin -5 -type f | xargs -r cat -- | gzip > "${TMP}"
-$ mv "${TMP}" /var/www/htdocs/erik/tail/10min
-$ find * -mmin -10 -type f | xargs -r cat -- | gzip > "${TMP}"
 $ mv "${TMP}" /var/www/htdocs/erik/tail/5min
+$ find * -mmin -10 -type f | xargs -r cat -- | gzip > "${TMP}"
+$ mv "${TMP}" /var/www/htdocs/erik/tail/10min
 $ unset TMP
 
 $ cd /var/www/htdocs/erik/tail/
