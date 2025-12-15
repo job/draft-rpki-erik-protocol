@@ -425,6 +425,9 @@ END]]>
         When one Erik relay generates a HTTP error, the client can try fetching the requested object from another Erik relay.
         To improve reliability, clients should alternate among different relays in successive query and fetch attempts.
       </t>
+      <t>
+        Clients <bcp14>SHOULD</bcp14> use HTTPS, unless the local system is unable to establish TLS connections to any of its configured Erik relays.
+      </t>
     </section>
 
     <section anchor="querying">
@@ -934,8 +937,10 @@ $ gzcat 10min | openssl asn1parse -inform DER | grep -c :d=0
           <contact fullname="Theo de Raadt"/>,
           <contact fullname="Bob Beck"/>,
           <contact fullname="Theo Buehler"/>,
+          <contact fullname="William McCall"/>,
+          <contact fullname="Jasdip Singh"/>,
           and
-          <contact fullname="William McCall"/>
+          <contact fullname="Michael Hollyman"/>,
         for the lovely conversations that led to this proposal.
         The authors wish to thank <contact fullname="Sean Turner"/> and <contact fullname="Russ Housley"/> for their review of the ASN.1 notation.
       </t>
