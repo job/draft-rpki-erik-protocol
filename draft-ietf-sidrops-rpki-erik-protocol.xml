@@ -403,38 +403,10 @@ END]]>
       </section>
     </section>
 
-<!-- XXX NOTE: it is not clear how to do snapshots or whether it is needed.
-
-    <section anchor="snapshots">
-      <name>Snapshots and Differentials</name>
-      <t>
-        Clients should be able to bootstrap initial state by fetching a snapshot.
-        A snapshot contains all RPKI objects a relay associated with a given FQDN as of the time of the snapshot's production.
-        Snapshots do not contain ErikIndex or ErikPartition objects.
-        Because snapshots are not produced in lockstep with updates to the merkle trees, clients MUST perform a tree comparison after fetching a snapshot.
-      </t>
-      <t>
-        Note: Snapshots encoding is TBD.
-      </t>
-      <t>
-        A compressed form (<xref target="RFC1951"/>, <xref target="RFC1952"/>) should be used because opportunistic compression in the transport layer (e.g. HTTP compressed content-encoding) is not universally available.
-      </t>
-      <t>
-        Fetching differences between snapshots ('deltas') might be specified at a later time, or might be concluded to be unnecessary.
-      </t>
-      <t>
-        <em>
-          Design notes:
-          While the <xref target="ustar"/> format is 'streamable', widely available, and an open standard, a notable downside is that <tt>.tar.gz</tt> objects likely wont be produced in a deterministic fashion across different implementations, warranting a choice for a bespoke format.
-        </em>
-      </t>
-    </section>
--->
-
     <section anchor="rp">
       <name>Client-side Processing</name>
       <t>
-        Clients start by fetching an <tt>ErikIndex</tt>, which is represents the relay's current Merkle tree head for a given FQDN.
+        Clients start by acquiring and processing an <tt>ErikIndex</tt>, which represents the relay's current Merkle tree head for a given FQDN.
         A client <bcp14>MUST</bcp14> verify the requested FQDN exactly matches the <tt>indexScope</tt> value in the <tt>ErikIndex</tt>, and if not proceed to use a different relay.
       </t>
       <t>
@@ -457,6 +429,7 @@ END]]>
 
     <section anchor="querying">
       <name>Querying an Erik Relay</name>
+
       <section title="Fetching objects by hash">
         <t>
           This specification uses "Named Information" identifiers mapped to <tt>.well-known</tt> HTTP/HTTPS URLs for object retrieval, as described in <xref target="RFC6920"/>.
@@ -468,18 +441,95 @@ END]]>
           To fetch the aforementioned object from an relay hosted at <tt>relay.example.net</tt>, a client would access the following HTTP URL:
           <tt>https://relay.example.net/.well-known/ni/sha-256/wtBCe8WjLELuoatWY9WSsfwpx9TvFqsLXh1jHQOdzCE</tt>
         </t>
+        <t>
+          Responses to requests for paths starting with <tt>/.well-known/ni/</tt> are immutable.
+        </t>
       </section>
+
       <section title="Fetching ErikIndex objects">
         <t>
-          The URIs to fetch ErikIndex objects can be constructed using the following Well-Known URI template with the <tt>erik</tt> keyword as suffix and the <tt>FQDN</tt> as parameter: <tt>https://{relay_host}/.well-known/erik/index/{FQDN}</tt>.
+          The URIs to fetch ErikIndex objects can be constructed using the following Well-Known URI template with the relay's hostname as authority, the <tt>erik</tt> keyword as suffix, the string <tt>/index/</tt>, followed by a FQDN as parameter, i.e.: <tt>https://{relay_hostname}/.well-known/erik/index/{FQDN}</tt>.
         </t>
         <t>
-          For example, the URI to fetch an <tt>ErikIndex</tt> for the <tt>rpki.ripe.net</tt> FQDN from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/index/rpki.ripe.net</tt>.
+          As an example, the URI to fetch an <tt>ErikIndex</tt> for the <tt>rpki.ripe.net</tt> FQDN from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/index/rpki.ripe.net</tt>.
         </t>
         <t>
           A client <bcp14>MAY</bcp14> use the <tt>If-Modified-Since</tt> HTTP header when fetching <tt>ErikIndex</tt> objects.
         </t>
+        <t>
+          Responses to requests for paths starting with <tt>/.well-known/erik/index/</tt> are mutable.
+        </t>
       </section>
+
+    </section>
+
+    <section anchor="prefetching">
+      <name>Prefetching Objects in Bulk</name>
+      <t>
+        Object prefetching is a bulk distribution mechanism for data that clients might need in the near future.
+        Prefetching is useful for efficiently bootstrapping empty caches and for clients to catch up on recently discovered objects with a single bulk request.
+      </t>
+
+      <t>
+        This section outlines the general structure of prefetch request responses and defines various <tt>.well-known/erik/</tt> endpoints.
+      </t>
+
+      <section>
+        <name>General Structure of Prefetch Responses</name>
+        <t>
+          In this protocol, a Prefetch Response (PR) is simply a concatenated sequence of zero or more DER-encoded objects in <xref target="RFC1952">gzip</xref> compressed form.
+          Because DER-encoded objects are self-delimiting, no marker is used between the objects and there is no end-of-sequence indicator.
+          <!-- FYI - I don't consider this a problem, but this also means that if any objects in the prefetching stream are not well-formed, it may not be possible to reliably decode the rest of the stream. -->
+        </t>
+        <t>
+          A Prefetch Response is non-deterministic: objects contained within the PR may appear in arbitrary order or in duplicate.
+          A PR may contain RPKI signed objects, <tt>ErikIndex</tt> objects, and <tt>ErikPartition</tt> objects.
+          The set of objects in a PR need not be self-consistent or complete from the perspective of top-down validation.
+          PRs merely serve to reduce network traffic by prefill unvalidated cache areas.
+        </t>
+
+        <t>
+          Different prefetching strategies have different trade-offs in terms of coverage and accuracy.
+          On the one hand aggressive prefetching might waste bandwidth (i.e. clients download data they might not end up using, or data they had already cached), on the other hand, sending many individual requests for each and every object increases network overhead and latency.
+          As a rule of thumb: <xref target="snappf">FQDN Snapshots</xref> are useful for clients with no prior state and <xref target="tailpf">Time-trimmed Tail Queues</xref> are useful in the steady state (when synchronizing every few minutes).
+        </t>
+        <t>
+          For efficiency, relay implementations are <bcp14>RECOMMENDED</bcp14> to combine as many DER-encoded objects into as few gzip members as possible (see <xref target="RFC1952" section="2.3"/> for information on gzip members).
+        </t>
+      </section>
+
+      <section anchor="snappf">
+        <name>Prefetching FQDN Snapshots</name>
+        <t>
+          A snapshot contains all RPKI &amp; Erik objects a relay associated with a given FQDN as of the time of the snapshot's production.
+          Snapshots are not necessarily produced in lockstep with updates to the relay's merkle trees, therefore clients <bcp14>MUST</bcp14> perform a tree comparison after fetching a snapshot.
+        </t>
+        <t>
+          As an example, the URI to fetch a snapshot for the <tt>rpki.ripe.net</tt> FQDN from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/snapshot/rpki.ripe.net</tt>.
+          Responses to requests for paths starting with <tt>/.well-known/erik/snapshot/</tt> are mutable.
+        </t>
+        <t>
+          See <xref target="mksnap"/> for an example how to construct a FQDN snapshot.
+        </t>
+      </section>
+
+      <section anchor="tailpf">
+        <name>Prefetching Time-trimmed Tail Queues</name>
+        <t>
+          A relay's time-trimmed tail queues are buffers that contains all RPKI &amp; Erik objects that relay discovered in the last 5 and 10 minutes, respectively.
+          Such buffers are not necessarily produced in lockstep with updates to the relay's merkle trees, therefore clients <bcp14>MUST</bcp14> perform a tree comparison after fetching a tail queue buffer.
+        </t>
+
+        <t>
+          As an example, the URI to fetch the 5 minute tail from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/tail/5min</tt>.
+          Responses to requests for paths starting with <tt>/.well-known/erik/tail/</tt> are mutable.
+        </t>
+
+        <t>
+          See <xref target="mktail"/> for an example how to pre-calculate Prefetch Responses using a time-trimmed tail queue concept.
+        </t>
+      </section>
+
     </section>
 
     <section anchor="error">
@@ -558,16 +608,6 @@ END]]>
 
     </section>
 
-    <section anchor="openquestions" removeInRFC="true">
-      <name>Open Questions</name>
-       <ul>
-         <li>Which of the possible deterministic manifest-to-partition assignment strategies yield the best results? AKI?</li>
-         <li>Are deterministic and cheap Snapshots possible? If so, what is the best archive format for Snapshots? The ustar/gzip combo might not easily yield deterministic results across different implementations.</li>
-         <li>Is the concept of Differentials/Deltas needed in Erik Synchronization?</li>
-         <li>What will be the upper bound for the number of partitions? (<tt>ub-Partitions</tt>)</li>
-       </ul>
-    </section>
-
     <section anchor="operational">
       <name>Operational Considerations</name>
       <section>
@@ -582,7 +622,8 @@ END]]>
       <section>
         <name>HTTP Compression</name>
         <t>
-          Using gzip compression on average tends to yield a 20% reduction in RPKI object size, therefore it is <bcp14>RECOMMENDED</bcp14> for clients and relays to offer support for compressed content coding, as described in <xref target="RFC9110" section="8.4.1"/>.
+          Using gzip compression on average tends to yield a 20% reduction in RPKI object size when fetching individual objects, therefore it is <bcp14>RECOMMENDED</bcp14> for clients and relays to offer support for compressed content coding, as described in <xref target="RFC9110" section="8.4.1"/>.
+          Prefetch responses (<xref target="prefetching"/>) are always in gzip compressed form.
         </t>
         <t>
           Using a previous version of a RPKI object as a compression dictionary for a newer version enables delivery of a delta-compressed version of the changes, usually resulting in significantly smaller responses than what can be achieved by compression alone.
@@ -667,10 +708,7 @@ Decimal  Description              References
 
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1034.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1123.xml"/>
-<!--
-        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1951.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1952.xml"/>
--->
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.5280.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.6810.xml"/>
@@ -829,6 +867,63 @@ Decimal  Description              References
         </t>
         <sourcecode anchor="ex_part" type="base64" src="_i_E-1WInRt8y8b7PA5x4uU1mJi6GyypwX0N8N0YNG0.b64"/>
       </section>
+    </section>
+
+    <section anchor="mksnap">
+      <name>Producing a FQDN Snapshot</name>
+      <t>
+        The following terminal transcript illustrates how one could prepare a Prefetch Response for <tt>rpki.ripe.net</tt> using common command line utilities.
+      </t>
+<sourcecode type="shell" markers="false">
+<![CDATA[
+$ cd /var/cache/rpki-client/rpki.ripe.net/
+$ export TMP="$(mktemp)"
+$ find . -type f | xargs -r cat -- | gzip > "${TMP}"
+$ mv "${TMP}" /var/www/htdocs/erik/snapshot/rpki.ripe.net
+$ unset TMP
+
+$ cd /var/www/htdocs/erik/snapshot/
+
+$ ls -nl rpki.ripe.net
+-rw-r--r--  1 1000  0  98392415 Dec 12 15:59 rpki.ripe.net
+
+$ file rpki.ripe.net
+rpki.ripe.net: gzip compressed data, from Unix
+
+$ gzcat rpki.ripe.net | openssl asn1parse -inform DER | grep -c :d=0
+109880
+]]>
+</sourcecode>
+    </section>
+
+    <section anchor="mktail">
+      <name>Producing a Time-Trimmed Tail Queue</name>
+      <t>
+        The following terminal transcript is an overly simplistic illustration how one could prepare the <tt>5min</tt> and <tt>10min</tt> time-trimmed tail queue Prefetch Responses using common command line utilities.
+      </t>
+<sourcecode type="shell" markers="false">
+<![CDATA[
+$ cd /var/cache/rpki-client/
+$ export TMP="$(mktemp)"
+$ find * -mmin -5 -type f | xargs -r cat -- | gzip > "${TMP}"
+$ mv "${TMP}" /var/www/htdocs/erik/tail/10min
+$ find * -mmin -10 -type f | xargs -r cat -- | gzip > "${TMP}"
+$ mv "${TMP}" /var/www/htdocs/erik/tail/5min
+$ unset TMP
+
+$ cd /var/www/htdocs/erik/tail/
+
+$ ls -nl 10min 5min
+-rw-r--r--  1 1000  0  946037 Dec 12 20:02 10min
+-rw-r--r--  1 1000  0  642883 Dec 12 20:02 5min
+
+$ gzcat 5min | openssl asn1parse -inform DER | grep -c :d=0
+206
+$ gzcat 10min | openssl asn1parse -inform DER | grep -c :d=0
+398
+]]>
+</sourcecode>
+
     </section>
 
     <section anchor="acknowledgements" numbered="false">

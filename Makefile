@@ -11,7 +11,7 @@ $(NAME).txt: $(NAME).xml
 
 $(NAME).html: $(NAME).txt
 
-www: $(NAME).xml
+www: $(NAME).txt $(NAME).html
 	cp $(NAME).exp.xml ~/Downloads/
 	cp $(NAME).html ~/Downloads/
 	cp $(NAME).txt ~/Downloads/
