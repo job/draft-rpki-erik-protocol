@@ -866,9 +866,9 @@ Decimal  Description              References
       <section>
         <name>Example ErikPartition</name>
         <t>
-          This object was retrieved from <tt>http://miso.sobornost.net/.well-known/ni/sha-256/_i_E-1WInRt8y8b7PA5x4uU1mJi6GyypwX0N8N0YNG0</tt>.
+          This object was retrieved from <tt>https://miso.sobornost.net/.well-known/ni/sha-256/AZmwyRKvBFv4DPl2g5IAhM8BbDvVWzZvgBLjORCoXqM</tt>.
         </t>
-        <sourcecode anchor="ex_part" type="base64" src="_i_E-1WInRt8y8b7PA5x4uU1mJi6GyypwX0N8N0YNG0.b64"/>
+        <sourcecode anchor="ex_part" type="base64" src="AZmwyRKvBFv4DPl2g5IAhM8BbDvVWzZvgBLjORCoXqM.b64"/>
       </section>
     </section>
 
