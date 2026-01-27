@@ -825,7 +825,7 @@ Decimal  Description              References
       </t>
       <dl>
         <dt><tt>http://relay.rpki-servers.org/</tt></dt>
-        <dd>Dublin, Montreal, Osaka, S&#227;o Paulo, Sydney - anycasted distributed computing cluster</dd>
+        <dd>Dublin, Osaka, Sydney - anycasted distributed computing cluster</dd>
 
         <dt><tt>http://dub.rpki-servers.org/</tt></dt>
         <dd>Dublin, Ireland, - distributed computing cluster (6 machines, NFS backend)</dd>
