@@ -512,6 +512,9 @@ END]]>
           Responses to requests for paths starting with <tt>/.well-known/erik/snapshot/</tt> are mutable.
         </t>
         <t>
+          Relays MUST NOT include ErikIndex and ErikPartition objects in snapshots.
+        </t>
+        <t>
           See <xref target="mksnap"/> for an example how to construct a FQDN snapshot.
         </t>
       </section>
@@ -519,13 +522,17 @@ END]]>
       <section anchor="tailpf">
         <name>Prefetching Time-trimmed Tail Queues</name>
         <t>
-          A relay's time-trimmed tail queues are buffers that contains all RPKI &amp; Erik objects that relay discovered in the last 5 and 10 minutes, respectively.
+          A relay's time-trimmed tail queues are buffers that contains all RPKI &amp; ErikPartition objects that relay discovered in the last 5 and 10 minutes, respectively.
           Such buffers are not necessarily produced in lockstep with updates to the relay's merkle trees, therefore clients <bcp14>MUST</bcp14> perform a tree comparison after fetching a tail queue buffer.
         </t>
 
         <t>
           As an example, the URI to fetch the 5 minute tail from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/tail/5min</tt>.
           Responses to requests for paths starting with <tt>/.well-known/erik/tail/</tt> are mutable.
+        </t>
+
+        <t>
+          Relays MUST NOT include ErikIndex objects in time-trimmed tail queue buffers.
         </t>
 
         <t>
