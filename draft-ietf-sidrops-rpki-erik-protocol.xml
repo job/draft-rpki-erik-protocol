@@ -182,7 +182,7 @@ version="3">
       <t>
         The client starts by querying an Erik relay for the relay's current ErikIndex for a given FQDN.
         If the ErikIndex is different compared to the previous run (or compared to the Index calculated from the locally cached objects).
-        With the ErikIndex in hand, the client can determine which ErikPartition are missing and fetch accordingly.
+        After having acquired the current ErikIndex, clients can determine which ErikPartitions need to be fetched.
         The client then can compare the <em>manifestNumber</em> sequence number and <em>thisUpdate</em> for each manifest listed in the ErikPartition, and proceed to fetch (purportedly) newer versions of manifests of interest.
         Whenever a relay has manifests with a lower sequence number on offer, the client can ignore those.
         The client now has sufficient information to proceed to fetch any missing Certificates, Signed objects, and CRLs.
