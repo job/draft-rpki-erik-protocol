@@ -871,6 +871,7 @@ Decimal  Description              References
             <date month="December" year="2025" />
           </front>
         </reference>
+
 <!--
         <reference anchor="rpki-client" target="https://www.rpki-client.org/">
           <front>
@@ -883,6 +884,16 @@ Decimal  Description              References
           </front>
         </reference>
 -->
+
+        <reference anchor="rpki-erik-demo" target="https://github.com/APNIC-net/rpki-erik-demo">
+          <front>
+            <title>rpki-erik-demo</title>
+            <author fullname="Tom Harrison">
+              <organization>APNIC</organization>
+            </author>
+            <date month="March" year="2026" />
+          </front>
+        </reference>
 
       </references>
     </references>
@@ -901,33 +912,43 @@ Decimal  Description              References
         According to RFC 7942, "this will allow reviewers and working groups to assign due consideration to documents that have the benefit of running code, which may serve as evidence of valuable experimentation and feedback that have made the implemented protocols more mature.
         It is up to the individual working groups to use this information as they see fit".
       </t>
-      <t>
-        A few experimental Erik relays are available, each running on slightly different schedules.
-        Client implementers are encouraged to round-robin between these instances to observe results.
-      </t>
-      <dl>
-        <dt><tt>http://relay.rpki-servers.org/</tt></dt>
-        <dd>Dublin, Osaka, Sydney - anycasted distributed computing cluster</dd>
 
-        <dt><tt>http://dub.rpki-servers.org/</tt></dt>
-        <dd>Dublin, Ireland, - distributed computing cluster (6 machines, NFS backend)</dd>
+      <section>
+        <name>Experimental Erik Relay Services</name>
+        <t>
+          A few experimental Erik relays are available, each running on slightly different schedules.
+          Client implementers are encouraged to round-robin between these instances to observe results.
+        </t>
+        <dl>
+          <dt><tt>http://relay.rpki-servers.org/</tt></dt>
+          <dd>Dublin, Osaka, Sydney - anycasted distributed computing cluster</dd>
 
-        <dt><tt>http://atl.rpki-servers.org/</tt></dt>
-        <dd>Atlanta, USA, - distributed computing cluster (2 machines, NFS backend)</dd>
+          <dt><tt>http://dub.rpki-servers.org/</tt></dt>
+          <dd>Dublin, Ireland, - distributed computing cluster (6 machines, NFS backend)</dd>
 
-        <dt><tt>http://miso.sobornost.net/</tt></dt>
-        <dd>Amsterdam, NL, single node</dd>
+          <dt><tt>http://atl.rpki-servers.org/</tt></dt>
+          <dd>Atlanta, USA, - distributed computing cluster (2 machines, NFS backend)</dd>
 
-        <dt><tt>http://nyc.rpki-servers.org/</tt></dt>
-        <dd>New York, USA, - single node</dd>
+          <dt><tt>http://miso.sobornost.net/</tt></dt>
+          <dd>Amsterdam, NL, single node</dd>
 
-        <dt><tt>http://fnllwqoupfrhso6643whm6lpkgsftjtc6crpehmyz2o7pffirnqy7rad.onion/</tt></dt>
-        <dd>Erik relay service via Tor</dd>
-      </dl>
+          <dt><tt>http://nyc.rpki-servers.org/</tt></dt>
+          <dd>New York, USA, - single node</dd>
 
-      <t>
-        An experimental Erik static content generator was developed by Job Snijders in the form of <xref target="rpkitouch"/> using <tt>C</tt>.
-      </t>
+          <dt><tt>http://fnllwqoupfrhso6643whm6lpkgsftjtc6crpehmyz2o7pffirnqy7rad.onion/</tt></dt>
+          <dd>Erik relay service via Tor</dd>
+        </dl>
+      </section>
+
+      <section>
+        <name>Software</name>
+        <t>
+          An experimental Erik static content generator was developed by Job Snijders in the form of <xref target="rpkitouch"/> using <tt>C</tt>.
+        </t>
+        <t>
+          An experimental Erik client and server were developed by Tom Harrison from APNIC in the form of <xref target="rpki-erik-demo"/> using <tt>Perl</tt>.
+        </t>
+      </section>
 
     </section>
 
