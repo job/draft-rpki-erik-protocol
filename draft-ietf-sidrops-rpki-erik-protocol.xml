@@ -698,16 +698,23 @@ Decimal  Description              References
 
       <section title="Well-Known URI">
         <t>
-          An URI Suffix in the Well-Known URIs registry specific to Erik synchronization will be requested.
-          See https://github.com/protocol-registries/well-known-uris/issues/67 for the request.
+          IANA is requested to assign an URI Suffix for Erik Synchronization in the Well-Known URIs registry as follows.
         </t>
-        <t>
-          The proposed suffix is <tt>erik</tt>.
-        </t>
+        <dl spacing="compact">
+          <dt>URI Suffix</dt><dd><tt>erik</tt></dd>
+          <dt>Reference:</dt><dd>[this draft]</dd>
+          <dt>Status:</dt><dd>permanent</dd>
+          <dt>Change Controller:</dt><dd>IETF</dd>
+          <dt>Related Information</dt><dd>-</dd>
+        </dl>
+        <section removeInRFC="true" toc="exclude">
+          <name>Protocol Registries Request at Github</name>
+          <t>
+            See https://github.com/protocol-registries/well-known-uris/issues/67 for a copy of this request.
+          </t>
+        </section>
       </section>
-
     </section>
-
   </middle>
 
   <back>
