@@ -673,7 +673,7 @@ Decimal  Description                          References
         </artwork>
       </section>
 
-      <section title="SMI Security for S/MIME CMS Content Type (1.2.840.113549.1.9.16.1)">
+      <section title="SMI Security for S/MIME CMS Content Type">
         <t>
           The IANA has allocated for this specification in the "SMI Security for S/MIME CMS Content Type (1.2.840.113549.1.9.16.1)" registry as follows:
         </t>
@@ -712,9 +712,9 @@ Decimal  Description              References
       <section>
         <name>Media Types</name>
         <t>
-          IANA is requested to register the media types "application/rpki-erikindex" and "application/rpki-erikpartition" in the "Media Types" registry as follows:
+          IANA is requested to register the media types "application/rpki-erikindex" and "application/rpki-erikpartition" in the "Media Types" registry as follows.
         </t>
-        <section>
+        <section toc="exclude">
           <name>ErikIndex Media Type</name>
           <dl spacing="compact">
             <dt>Type name:</dt><dd>application</dd>
@@ -744,7 +744,7 @@ Decimal  Description              References
             <dt>Change controller:</dt><dd>IETF</dd>
           </dl>
         </section>
-        <section>
+        <section toc="exclude">
           <name>ErikPartition Media Type</name>
           <dl spacing="compact">
             <dt>Type name:</dt><dd>application</dd>
