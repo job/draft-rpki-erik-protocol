@@ -180,8 +180,8 @@ version="3">
         This approach reduces unnecessary data transfer between caches which contain mostly similar data.
       </t>
       <t>
-        The client starts by querying an Erik relay for the relay's current ErikIndex for a given FQDN.
-        If the ErikIndex is different compared to the previous run (or compared to the Index calculated from the locally cached objects).
+        The client starts by making an inventory of its local state and then querying an Erik relay for the relay's current ErikIndex for a given FQDN.
+        If the ErikIndex is different compared to the previous run (or compared to the ErikIndex derived from locally cached objects).
         After having acquired the current ErikIndex, clients can determine which ErikPartitions need to be fetched.
         The client then can compare the <em>manifestNumber</em> sequence number and <em>thisUpdate</em> for each manifest listed in the ErikPartition, and proceed to fetch (purportedly) newer versions of manifests of interest.
         Whenever a relay has manifests with a lower sequence number on offer, the client can ignore those.
@@ -352,8 +352,9 @@ END]]>
       <section anchor="asn1-partition">
         <name>ErikPartition</name>
         <t>
-          An ErikPartition represents a subset of manifest objects available under a given FQDN.
-          Each ErikPartition is an ordered listing of the manifest objects' hashes, manifestNumber values, thisUpdate values, and their end-entity certificates' SIA extension values.
+          An ErikPartition represents the set of manifest objects under a given FQDN which have the same first octet of the Authority Key Identifier (AKI) in common with each other.
+          Using the first octet of the AKI facilitates even and deterministic distribution of ManifestRefs across ErikPartitions.
+          Each ErikPartition is an ordered listing of the manifest objects' hashes, object sizes, AKI, manifestNumber values, thisUpdate values, and their respective end-entity certificates' SIA extension values.
         </t>
 
         <section title="The version field">
@@ -559,13 +560,6 @@ END]]>
       <t>
         Relays generate and make accessible ErikIndexes and ErikPartitions derived from their current validation state, the client then cherry-picks which objects (if any) it wishes to fetch.
         In turn, relays fetch fresh data from other relays, or from CA-designated publication points accessible via Rsync (<xref target="RFC5781"/>) and RRDP (<xref target="RFC8182"/>).
-      </t>
-      <t>
-        <em>
-          Design notes: a decision must be made on a deterministic "manifest-to-partition" assignment scheme.
-          Job's proof-of-concept relay (see <xref target="running_code"/>) uses the first few octets of the the Manifest's AKI as a stable partition assignment scheme.
-          Other strategies could be to assign manifests to ErikPartitions based on the "hour-of-day" of the CMS signing timestamp, or the first few octets of the SHA-256 of the manifest object.
-        </em>
       </t>
     </section>
 
