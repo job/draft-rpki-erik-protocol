@@ -714,6 +714,74 @@ Decimal  Description              References
           </t>
         </section>
       </section>
+
+      <section>
+        <name>Media Types</name>
+        <t>
+          IANA is requested to register the media types "application/rpki-erikindex" and "application/rpki-erikpartition" in the "Media Types" registry as follows:
+        </t>
+        <section>
+          <name>ErikIndex Media Type</name>
+          <dl spacing="compact">
+            <dt>Type name:</dt><dd>application</dd>
+            <dt>Subtype name:</dt><dd>rpki-erikindex</dd>
+            <dt>Required parameters:</dt><dd>N/A</dd>
+            <dt>Optional parameters:</dt><dd>N/A</dd>
+            <dt>Encoding considerations:</dt><dd>binary</dd>
+            <dt>Security considerations:</dt><dd>This media type contains no active content.</dd>
+            <dt>Interoperability considerations:</dt><dd>N/A</dd>
+            <dt>Published specification:</dt><dd>draft-ietf-sidrops-erik-protocol</dd>
+            <dt>Applications that use this media type:</dt><dd>RPKI operators</dd>
+            <dt>Fragment identifier considerations:</dt><dd>N/A</dd>
+            <dt>Additional information:</dt>
+            <dd>
+              <dl spacing="compact">
+                <dt><br/></dt><dd/>
+                <dt>Content:</dt><dd>This media type is a RPKI ErikIndex object, as defined in draft-ietf-sidrops-erik-protocol.</dd>
+                <dt>Magic number(s):</dt><dd>N/A</dd>
+                <dt>File extension(s):</dt><dd>N/A</dd>
+                <dt>Macintosh file type code(s):</dt><dd>N/A</dd>
+              </dl>
+            </dd>
+            <dt>Person &amp; email address to contact for further information:</dt><dd>Job Snijders (job@bsd.nl)</dd>
+            <dt>Intended usage:</dt><dd>COMMON</dd>
+            <dt>Restrictions on usage:</dt><dd>N/A</dd>
+            <dt>Author:</dt><dd>Job Snijders (job@bsd.nl)</dd>
+            <dt>Change controller:</dt><dd>IETF</dd>
+          </dl>
+        </section>
+        <section>
+          <name>ErikPartition Media Type</name>
+          <dl spacing="compact">
+            <dt>Type name:</dt><dd>application</dd>
+            <dt>Subtype name:</dt><dd>rpki-erikpartition</dd>
+            <dt>Required parameters:</dt><dd>N/A</dd>
+            <dt>Optional parameters:</dt><dd>N/A</dd>
+            <dt>Encoding considerations:</dt><dd>binary</dd>
+            <dt>Security considerations:</dt><dd>This media type contains no active content.</dd>
+            <dt>Interoperability considerations:</dt><dd>N/A</dd>
+            <dt>Published specification:</dt><dd>draft-ietf-sidrops-erik-protocol</dd>
+            <dt>Applications that use this media type:</dt><dd>RPKI operators</dd>
+            <dt>Fragment identifier considerations:</dt><dd>N/A</dd>
+            <dt>Additional information:</dt>
+            <dd>
+              <dl spacing="compact">
+                <dt><br/></dt><dd/>
+                <dt>Content:</dt><dd>This media type is a RPKI ErikPartition object, as defined in draft-ietf-sidrops-erik-protocol.</dd>
+                <dt>Magic number(s):</dt><dd>N/A</dd>
+                <dt>File extension(s):</dt><dd>N/A</dd>
+                <dt>Macintosh file type code(s):</dt><dd>N/A</dd>
+              </dl>
+            </dd>
+            <dt>Person &amp; email address to contact for further information:</dt><dd>Job Snijders (job@bsd.nl)</dd>
+            <dt>Intended usage:</dt><dd>COMMON</dd>
+            <dt>Restrictions on usage:</dt><dd>N/A</dd>
+            <dt>Author:</dt><dd>Job Snijders (job@bsd.nl)</dd>
+            <dt>Change controller:</dt><dd>IETF</dd>
+          </dl>
+        </section>
+      </section>
+
     </section>
   </middle>
 
