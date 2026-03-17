@@ -352,8 +352,8 @@ END]]>
       <section anchor="asn1-partition">
         <name>ErikPartition</name>
         <t>
-          An ErikPartition represents the set of manifest objects under a given FQDN which have the same first octet of the Authority Key Identifier (AKI) in common with each other.
-          Using the first octet of the AKI facilitates even and deterministic distribution of ManifestRefs across ErikPartitions.
+          An ErikPartition represents the set of manifest objects under a given FQDN which have the same first two octets of the Authority Key Identifier (AKI) in common with each other.
+          Using the first two octets of the AKI as partition key facilitates even and deterministic distribution of ManifestRefs across ErikPartitions.
           Each ErikPartition is an ordered listing of the manifest objects' hashes, object sizes, AKI, manifestNumber values, thisUpdate values, and their respective end-entity certificates' SIA extension values.
         </t>
 
