@@ -193,10 +193,8 @@ version="3">
     <section anchor="asn1">
       <name>Erik Synchronization Data Structure Definitions</name>
       <t>
-        In this synchronization protocol the <em>signal layer</em> makes use of DER-encoded messages <xref target="X.690"/>.
-      </t>
-      <t>
-        <em>Design note: DER encoding was selected for its canonical properties and because RPKI cache implementations already support ASN.1 encoding.</em>
+        The messages used in this protocol to construct and determine synchronization states are encoded following Distinguished Encoding Rules (DER) <xref target="X.690"/>.
+        <tt>ErikIndex</tt> and <tt>ErikPartition</tt> objects are formally defined as follows.
       </t>
 <sourcecode type="asn.1" markers="false">
 <![CDATA[
