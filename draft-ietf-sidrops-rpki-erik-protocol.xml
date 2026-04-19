@@ -1019,6 +1019,9 @@ $ gzcat 10min | openssl asn1parse -inform DER | grep -c :d=0
     <section anchor="acknowledgements" numbered="false">
       <name>Acknowledgements</name>
       <t>
+        This protocol is named after Erik Bais, who passed away in 2024, as a small token of appreciation for his friendship.
+      </t>
+      <t>
         The authors wish to thank
           <contact fullname="George Michaelson"/>,
           <contact fullname="Theo de Raadt"/>,
@@ -1032,9 +1035,8 @@ $ gzcat 10min | openssl asn1parse -inform DER | grep -c :d=0
         The authors wish to thank <contact fullname="Sean Turner"/> and <contact fullname="Russ Housley"/> for their review of the ASN.1 notation.
       </t>
       <t>
-        This protocol is named after Erik Bais, who passed away in 2024, as a small token of appreciation for his friendship.
+        Job Snijders is partly funded by the NGI0 Commons Fund, a fund established by NLnet with financial support from the European Commission's Next Generation Internet under grant agreement No 101135429.
       </t>
     </section>
-
   </back>
 </rfc>
