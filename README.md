@@ -1,6 +1,6 @@
-# draft-spaghetti-sidrops-rpki-erik-protocol
+# draft-ietf-sidrops-rpki-erik-protocol
 
-Work in progress repository for Internet-Draft draft-spaghetti-sidrops-rpki-erik-protocol
+Work in progress repository for Internet-Draft draft-ietf-sidrops-rpki-erik-protocol
 
 The draft specification of ERIK, a synchronisation protocol for use with
 the Resource Public Key Infrastructure (RPKI).  The ERIK protocol can
@@ -20,7 +20,7 @@ In the XML use one sentence per line. This makes git diff review much easier.
 
 The source files for the Internet-Draft documents are:
 
-- `draft-spaghetti-sidrops-rpki-erik-protocol.xml`
+- `draft-ietf-sidrops-rpki-erik-protocol.xml`
 
 To regenerate the text and HTML versions after making changes, run:
 
