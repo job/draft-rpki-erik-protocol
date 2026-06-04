@@ -194,10 +194,14 @@ version="3">
       <name>Erik Synchronization Data Structure Definitions</name>
       <t>
         The messages used in this protocol to construct and determine synchronization states are encoded following Distinguished Encoding Rules (DER) <xref target="X.690"/>.
-        <tt>ErikIndex</tt> and <tt>ErikPartition</tt> objects are formally defined as follows.
+      </t>
+      <t>
+        <tt>ErikIndex</tt>, <tt>ErikPartition</tt>, and <tt>ErikSegmentIndex</tt> objects are formally defined as follows:
       </t>
 <sourcecode type="asn.1" markers="false">
 <![CDATA[
+<CODE BEGINS>
+
 RpkiErikSynchronization-2025
   { iso(1) member-body(2) us(840) rsadsi(113549)
     pkcs(1) pkcs9(9) smime(16) mod(0)
@@ -226,7 +230,7 @@ ContentInfo ::= SEQUENCE {
                      CONTENT-TYPE.&Type({ContentSet}{@contentType}) }
 
 ContentSet CONTENT-TYPE ::= {
-  ct-rpkiErikIndex | ct-rpkiErikPartition, ct-rpkiErikSegmentIndex, ... }
+  ct-rpkiErikIndex | ct-rpkiErikPartition | ct-rpkiErikSegmentIndex | ... }
 
 ct-rpkiErikIndex CONTENT-TYPE ::=
   { TYPE ErikIndex IDENTIFIED BY id-ct-rpkiErikIndex }
@@ -290,6 +294,7 @@ SegmentRef ::= SEQUENCE {
   segment         GeneralizedTime,
   erikIndexHash   Digest }
 
+<CODE ENDS>
 END]]>
 </sourcecode>
 
@@ -579,7 +584,7 @@ END]]>
           Responses to requests for paths starting with <tt>/.well-known/erik/snapshot/</tt> are mutable.
         </t>
         <t>
-          Relays MUST NOT include ErikIndex and ErikPartition objects in snapshots.
+          Relays MUST NOT include <tt>ErikIndex</tt> and <tt>ErikPartition</tt> objects in snapshots.
         </t>
         <t>
           See <xref target="mksnap"/> for an example how to construct a FQDN snapshot.
