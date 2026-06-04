@@ -226,21 +226,28 @@ ContentInfo ::= SEQUENCE {
                      CONTENT-TYPE.&Type({ContentSet}{@contentType}) }
 
 ContentSet CONTENT-TYPE ::= {
-  ct-rpkiErikIndex | ct-rpkiErikPartition, ... }
+  ct-rpkiErikIndex | ct-rpkiErikPartition, ct-rpkiErikSegmentIndex, ... }
 
 ct-rpkiErikIndex CONTENT-TYPE ::=
   { TYPE ErikIndex IDENTIFIED BY id-ct-rpkiErikIndex }
 
 id-ct-rpkiErikIndex OBJECT IDENTIFIER ::=
   { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
-    pkcs-9(9) id-smime(16) id-ct(1) erikindex(55) }
+    pkcs-9(9) id-smime(16) id-ct(1) erikIndex(55) }
 
 ct-rpkiErikPartition CONTENT-TYPE ::=
   { TYPE ErikPartition IDENTIFIED BY id-ct-rpkiErikPartition }
 
 id-ct-rpkiErikPartition OBJECT IDENTIFIER ::=
   { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
-    pkcs-9(9) id-smime(16) id-ct(1) erikpartition(56) }
+    pkcs-9(9) id-smime(16) id-ct(1) erikPartition(56) }
+
+ct-rpkiErikSegmentIndex CONTENT-TYPE ::=
+  { TYPE ErikSegmentIndex IDENTIFIED BY id-ct-rpkiErikSegmentIndex }
+
+id-ct-rpkiErikSegmentIndex OBJECT IDENTIFIER ::=
+  { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+    pkcs-9(9) id-smime(16) id-ct(1) erikSegmentIndex(TBD) }
 
 ErikIndex ::= SEQUENCE {
   version [0]      INTEGER DEFAULT 0,
@@ -269,6 +276,20 @@ ManifestRef ::= SEQUENCE {
   manifestNumber   INTEGER (0..MAX),
   thisUpdate       GeneralizedTime,
   locations        SEQUENCE (SIZE(1..MAX)) OF AccessDescription }
+
+ErikSegmentIndex ::= SEQUENCE {
+  version [0]      INTEGER DEFAULT 0,
+  segmentScope     IA5String,
+  segmentTime      GeneralizedTime,
+  hashAlg          DigestAlgorithmIdentifier,
+  segmentList      SEQUENCE (SIZE(1..ub-Segments)) OF SegmentRef }
+
+ub-Segments INTEGER ::= 36
+
+SegmentRef ::= SEQUENCE {
+  segment         GeneralizedTime,
+  erikIndexHash   Digest }
+
 END]]>
 </sourcecode>
 
@@ -317,7 +338,7 @@ END]]>
             The field's value is a rough indication when the ErikIndex was generated and can be used for troubleshooting and measurement purposes.
           </t>
           <t>
-            For the purposes of this profile, <tt>GeneralizedTime</tt> values MUST be expressed UTC (Zulu) and MUST include seconds (i.e., times are YYYYMMDDHHMMSSZ), even where the number of seconds is zero.
+            For the purposes of this profile, <tt>GeneralizedTime</tt> values MUST be expressed in UTC (Zulu) and MUST include seconds (i.e., times are YYYYMMDDHHMMSSZ), even where the number of seconds is zero.
             GeneralizedTime values MUST NOT include fractional seconds.
             See <xref target="RFC5280" section="4.1.2.5.2"/>.
           </t>
@@ -364,7 +385,7 @@ END]]>
             The field's value is a rough indication when the ErikPartition was generated and can be used for troubleshooting and measurement purposes.
           </t>
           <t>
-            For the purposes of this profile, <tt>GeneralizedTime</tt> values MUST be expressed UTC (Zulu) and MUST include seconds (i.e., times are YYYYMMDDHHMMSSZ), even where the number of seconds is zero.
+            For the purposes of this profile, <tt>GeneralizedTime</tt> values MUST be expressed in UTC (Zulu) and MUST include seconds (i.e., times are YYYYMMDDHHMMSSZ), even where the number of seconds is zero.
             GeneralizedTime values MUST NOT include fractional seconds.
             See <xref target="RFC5280" section="4.1.2.5.2"/>.
           </t>
@@ -390,8 +411,63 @@ END]]>
             Information elements are unique with respect to one another and sorted in ascending order of the hash.
           </t>
         </section>
+      </section>
+
+      <section anchor="asn1-segmentindex">
+        <name>ErikSegmentIndex</name>
+        <t>
+          An <tt>ErikSegmentIndex</tt> represents segments that contain RPKI objects that a relay discovered in a short time window.
+        </t>
+
+        <section title="The version field">
+          <t>
+            The version number of the <tt>ErikSegmentIndex</tt> object <bcp14>MUST</bcp14> be 0.
+          </t>
+        </section>
+
+        <section title="The segmentScope field">
+          <t>
+            The <tt>segmentScope</tt> field contains the fully qualified domain name of the Signed Object locations referenced through this particular <tt>ErikSegmentIndex</tt>.
+            The FQDN <bcp14>MUST</bcp14> be in the "preferred name syntax", as specified by <xref target="RFC1034" section="3.5"/> and modified by <xref target="RFC1123" section="2.1"/>.
+          </t>
+        </section>
+
+        <section title="the segmentTime field">
+          <t>
+            The <tt>segmentTime</tt> is the most recent <tt>partitionTime</tt> value among the <tt>ErikPartitions</tt> contained within the segments referenced from the <tt>ErikSegmentIndex</tt> at hand.
+            The field's value is a rough indication when the last segment was generated and can be used for troubleshooting and measurement purposes.
+          </t>
+          <t>
+            For the purposes of this profile, <tt>GeneralizedTime</tt> values MUST be expressed in UTC (Zulu) and MUST include seconds (i.e., times are YYYYMMDDHHMMSSZ), even where the number of seconds is zero.
+            GeneralizedTime values MUST NOT include fractional seconds.
+            See <xref target="RFC5280" section="4.1.2.5.2"/>.
+          </t>
+        </section>
+
+        <section title="the hashAlg field">
+          <t>
+            This field contains the OID of the hash algorithm used to hash latest ErikIndex appended to a given segment.
+            The hash algorithm used MUST conform to the RPKI Algorithms and Key Size Profile specification <xref target="RFC7935"/>.
+          </t>
+        </section>
+
+        <section title="the segmentList field">
+          <t>
+            This field is a sequence of <tt>SegmentRef</tt> instances.
+            There is one <tt>SegmentRef</tt> for each current segment.
+          </t>
+          <t>
+            A <tt>SegmentRef</tt> is a SEQUENCE consisting of a segment identifier and a hash.
+            The segment identifier is expressed as a <tt>GeneralizedTime</tt> and indicates the moment in time the segment was initialized.
+            The hash in the <tt>erikIndexHash</tt> field is the message digest calculated over the last <tt>ErikIndex</tt> associated with the segment.
+          </t>
+          <t>
+            Information elements are unique with respect to one another and sorted in ascending order of the <tt>segment</tt> identifier.
+          </t>
+        </section>
 
       </section>
+
     </section>
 
     <section anchor="rp">
@@ -485,7 +561,7 @@ END]]>
         <t>
           Different prefetching strategies have different trade-offs in terms of coverage and accuracy.
           On the one hand aggressive prefetching might waste bandwidth (i.e. clients download data they might not end up using, or data they had already cached), on the other hand, sending many individual requests for each and every object increases network overhead and latency.
-          As a rule of thumb: <xref target="snappf">FQDN Snapshots</xref> are useful for clients with no prior state and <xref target="tailpf">Time-trimmed Tail Queues</xref> are useful in the steady state (when synchronizing every few minutes).
+          As a rule of thumb: <xref target="snappf">FQDN Snapshots</xref> are useful for clients with no prior state and <xref target="segmentpf">Segments</xref> are useful in the steady state (when synchronizing every few minutes).
         </t>
         <t>
           For efficiency, relay implementations are <bcp14>RECOMMENDED</bcp14> to combine as many DER-encoded objects into as few gzip members as possible (see <xref target="RFC1952" section="2.3"/> for information on gzip members).
@@ -510,24 +586,19 @@ END]]>
         </t>
       </section>
 
-      <section anchor="tailpf">
-        <name>Prefetching Time-trimmed Tail Queues</name>
+      <section anchor="segmentpf">
+        <name>Prefetching Segments</name>
         <t>
-          A relay's time-trimmed tail queues are buffers that contains all RPKI &amp; ErikPartition objects that relay discovered in the last 5 and 10 minutes, respectively.
-          Such buffers are not necessarily produced in lockstep with updates to the relay's merkle trees, therefore clients <bcp14>MUST</bcp14> perform a tree comparison after fetching a tail queue buffer.
+          A relay's segments are buffers that contains all RPKI &amp; ErikPartition objects that relay discovered in the last few hours.
         </t>
 
         <t>
-          As an example, the URI to fetch the 5 minute tail from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/tail/5min</tt>.
-          Responses to requests for paths starting with <tt>/.well-known/erik/tail/</tt> are mutable.
+          As an example, the URI to fetch the segment starting at Jun 4th, 2026, 15:50:00 UTC from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/segment/1780588200</tt>.
+          Responses to requests for paths starting with <tt>/.well-known/erik/segment/</tt> are mutable.
         </t>
 
         <t>
-          Relays MUST NOT include ErikIndex objects in time-trimmed tail queue buffers.
-        </t>
-
-        <t>
-          See <xref target="mktail"/> for an example how to pre-calculate Prefetch Responses using a time-trimmed tail queue concept.
+          Relays MUST NOT include ErikIndex objects in segment buffers.
         </t>
       </section>
 
@@ -658,7 +729,7 @@ END]]>
 <![CDATA[
 Decimal  Description                          References
 ----------------------------------------------------------
-  TDB    id-mod-rpkiErikSynchronization-2025  [this-draft]
+  TDB    id-mod-rpkiErikSynchronization-2025  [this_document]
 ]]>
         </artwork>
       </section>
@@ -669,10 +740,11 @@ Decimal  Description                          References
         </t>
         <artwork>
 <![CDATA[
-Decimal  Description              References
-----------------------------------------------
-   55    id-ct-rpkiErikIndex      [this-draft]
-   56    id-ct-rpkiErikPartition  [this-draft]
+Decimal  Description                 References
+----------------------------------------------------
+   55    id-ct-rpkiErikIndex         [this_document]
+   56    id-ct-rpkiErikPartition     [this_document]
+  TBD    id-ct-rpkiErikSegmentIndex  [this_document]
 ]]>
         </artwork>
         <t>
@@ -702,8 +774,9 @@ Decimal  Description              References
       <section>
         <name>Media Types</name>
         <t>
-          IANA is requested to register the media types "application/rpki-erikindex" and "application/rpki-erikpartition" in the "Media Types" registry as follows.
+          IANA is requested to register the media types "application/rpki-erikindex", "application/rpki-erikpartition", and "application/rpki-eriksegmentindex" in the "Media Types" registry as follows.
         </t>
+
         <section toc="exclude">
           <name>ErikIndex Media Type</name>
           <dl spacing="compact">
@@ -714,14 +787,14 @@ Decimal  Description              References
             <dt>Encoding considerations:</dt><dd>binary</dd>
             <dt>Security considerations:</dt><dd>This media type contains no active content.</dd>
             <dt>Interoperability considerations:</dt><dd>N/A</dd>
-            <dt>Published specification:</dt><dd>draft-ietf-sidrops-erik-protocol</dd>
+            <dt>Published specification:</dt><dd>[this_document]</dd>
             <dt>Applications that use this media type:</dt><dd>RPKI operators</dd>
             <dt>Fragment identifier considerations:</dt><dd>N/A</dd>
             <dt>Additional information:</dt>
             <dd>
               <dl spacing="compact">
                 <dt><br/></dt><dd/>
-                <dt>Content:</dt><dd>This media type is a RPKI ErikIndex object, as defined in draft-ietf-sidrops-erik-protocol.</dd>
+                <dt>Content:</dt><dd>This media type is a RPKI ErikIndex object, as defined in [this_document].</dd>
                 <dt>Magic number(s):</dt><dd>N/A</dd>
                 <dt>File extension(s):</dt><dd>N/A</dd>
                 <dt>Macintosh file type code(s):</dt><dd>N/A</dd>
@@ -734,6 +807,7 @@ Decimal  Description              References
             <dt>Change controller:</dt><dd>IETF</dd>
           </dl>
         </section>
+
         <section toc="exclude">
           <name>ErikPartition Media Type</name>
           <dl spacing="compact">
@@ -744,14 +818,14 @@ Decimal  Description              References
             <dt>Encoding considerations:</dt><dd>binary</dd>
             <dt>Security considerations:</dt><dd>This media type contains no active content.</dd>
             <dt>Interoperability considerations:</dt><dd>N/A</dd>
-            <dt>Published specification:</dt><dd>draft-ietf-sidrops-erik-protocol</dd>
+            <dt>Published specification:</dt><dd>[this_document]</dd>
             <dt>Applications that use this media type:</dt><dd>RPKI operators</dd>
             <dt>Fragment identifier considerations:</dt><dd>N/A</dd>
             <dt>Additional information:</dt>
             <dd>
               <dl spacing="compact">
                 <dt><br/></dt><dd/>
-                <dt>Content:</dt><dd>This media type is a RPKI ErikPartition object, as defined in draft-ietf-sidrops-erik-protocol.</dd>
+                <dt>Content:</dt><dd>This media type is a RPKI ErikPartition object, as defined in [this_document].</dd>
                 <dt>Magic number(s):</dt><dd>N/A</dd>
                 <dt>File extension(s):</dt><dd>N/A</dd>
                 <dt>Macintosh file type code(s):</dt><dd>N/A</dd>
@@ -764,6 +838,38 @@ Decimal  Description              References
             <dt>Change controller:</dt><dd>IETF</dd>
           </dl>
         </section>
+
+        <section toc="exclude">
+          <name>ErikSegmentIndex Media Type</name>
+          <dl spacing="compact">
+            <dt>Type name:</dt><dd>application</dd>
+            <dt>Subtype name:</dt><dd>rpki-eriksegmentindex</dd>
+            <dt>Required parameters:</dt><dd>N/A</dd>
+            <dt>Optional parameters:</dt><dd>N/A</dd>
+            <dt>Encoding considerations:</dt><dd>binary</dd>
+            <dt>Security considerations:</dt><dd>This media type contains no active content.</dd>
+            <dt>Interoperability considerations:</dt><dd>N/A</dd>
+            <dt>Published specification:</dt><dd>[this_document]</dd>
+            <dt>Applications that use this media type:</dt><dd>RPKI operators</dd>
+            <dt>Fragment identifier considerations:</dt><dd>N/A</dd>
+            <dt>Additional information:</dt>
+            <dd>
+              <dl spacing="compact">
+                <dt><br/></dt><dd/>
+                <dt>Content:</dt><dd>This media type is a RPKI ErikSegmentIndex object, as defined in [this_document].</dd>
+                <dt>Magic number(s):</dt><dd>N/A</dd>
+                <dt>File extension(s):</dt><dd>N/A</dd>
+                <dt>Macintosh file type code(s):</dt><dd>N/A</dd>
+              </dl>
+            </dd>
+            <dt>Person &amp; email address to contact for further information:</dt><dd>Job Snijders (job@bsd.nl)</dd>
+            <dt>Intended usage:</dt><dd>COMMON</dd>
+            <dt>Restrictions on usage:</dt><dd>N/A</dd>
+            <dt>Author:</dt><dd>Job Snijders (job@bsd.nl)</dd>
+            <dt>Change controller:</dt><dd>IETF</dd>
+          </dl>
+        </section>
+
       </section>
 
     </section>
@@ -984,36 +1090,6 @@ $ gzcat rpki.ripe.net | openssl asn1parse -inform DER | grep -c :d=0
 109880
 ]]>
 </sourcecode>
-    </section>
-
-    <section anchor="mktail">
-      <name>Producing a Time-Trimmed Tail Queue</name>
-      <t>
-        The following terminal transcript is an overly simplistic illustration how one could prepare the <tt>5min</tt> and <tt>10min</tt> time-trimmed tail queue Prefetch Responses using common command line utilities.
-      </t>
-<sourcecode type="shell" markers="false">
-<![CDATA[
-$ cd /var/cache/rpki-client/
-$ export TMP="$(mktemp)"
-$ find * -mmin -5 -type f | xargs -r cat -- | gzip > "${TMP}"
-$ mv "${TMP}" /var/www/htdocs/erik/tail/5min
-$ find * -mmin -10 -type f | xargs -r cat -- | gzip > "${TMP}"
-$ mv "${TMP}" /var/www/htdocs/erik/tail/10min
-$ unset TMP
-
-$ cd /var/www/htdocs/erik/tail/
-
-$ ls -nl 10min 5min
--rw-r--r--  1 1000  0  946037 Dec 12 20:02 10min
--rw-r--r--  1 1000  0  642883 Dec 12 20:02 5min
-
-$ gzcat 5min | openssl asn1parse -inform DER | grep -c :d=0
-206
-$ gzcat 10min | openssl asn1parse -inform DER | grep -c :d=0
-398
-]]>
-</sourcecode>
-
     </section>
 
     <section anchor="acknowledgements" numbered="false">
