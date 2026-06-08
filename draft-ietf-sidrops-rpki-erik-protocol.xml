@@ -437,7 +437,7 @@ END]]>
           </t>
         </section>
 
-        <section title="the segmentTime field">
+        <section title="the segmentTime field" anchor="segmentTime">
           <t>
             The <tt>segmentTime</tt> is the most recent <tt>partitionTime</tt> value among the <tt>ErikPartitions</tt> contained within the segments referenced from the <tt>ErikSegmentIndex</tt> at hand.
             The field's value is a rough indication when the last segment was generated and can be used for troubleshooting and measurement purposes.
@@ -542,7 +542,7 @@ END]]>
       <name>Prefetching Objects in Bulk</name>
       <t>
         Object prefetching is a bulk distribution mechanism for data that clients might need in the near future.
-        Prefetching is useful for efficiently bootstrapping empty caches and for clients to catch up on recently discovered objects with a single bulk request.
+        Prefetching is useful for efficiently bootstrapping empty caches and for clients to catch up on recently discovered objects through fewer requests.
       </t>
 
       <t>
@@ -594,14 +594,17 @@ END]]>
       <section anchor="segmentpf">
         <name>Prefetching Segments</name>
         <t>
-          A relay's segments are buffers that contains all RPKI &amp; ErikPartition objects that relay discovered in the last few hours.
+          Segments buffers form an append-only log which contains all RPKI &amp; ErikPartition objects that relay discovered in the last few hours.
+          Relay implementations are <bcp14>RECOMMENDED</bcp14> to start a new segment buffer every 5 minutes.
         </t>
-
         <t>
-          As an example, the URI to fetch the segment starting at Jun 4th, 2026, 15:50:00 UTC from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/segment/1780588200</tt>.
+          The URIs to fetch segments are constructed by transforming the <tt>segmentTime</tt> (<xref target="segmentTime"/>) to integer representation.
+          The integer value is the number of seconds, excluding leap seconds, after midnight UTC, January 1, 1970.
           Responses to requests for paths starting with <tt>/.well-known/erik/segment/</tt> are mutable.
         </t>
-
+        <t>
+          As an example, the URI to fetch the segment starting at Jun 4th, 2026, 15:50:00 UTC from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/segment/1780588200</tt>.
+        </t>
         <t>
           Relays MUST NOT include ErikIndex objects in segment buffers.
         </t>
