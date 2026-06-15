@@ -594,7 +594,7 @@ END]]>
       <section anchor="segmentpf">
         <name>Prefetching Segments</name>
         <t>
-          Segments buffers form an append-only log which contains all RPKI &amp; ErikPartition objects that relay discovered in the last few hours.
+          Segments buffers form an append-only log which contains all signed RPKI objects, ErikIndex objects, and ErikPartition objects the relay discovered in the last few hours.
           Relay implementations are <bcp14>RECOMMENDED</bcp14> to start a new segment buffer every 5 minutes.
         </t>
         <t>
@@ -603,10 +603,7 @@ END]]>
           Responses to requests for paths starting with <tt>/.well-known/erik/segment/</tt> are mutable.
         </t>
         <t>
-          As an example, the URI to fetch the segment starting at Jun 4th, 2026, 15:50:00 UTC from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/segment/1780588200</tt>.
-        </t>
-        <t>
-          Relays MUST NOT include ErikIndex objects in segment buffers.
+          As an example, the URI to fetch the segment for <tt>rpki.ripe.net</tt> starting at Jun 4th, 2026, 15:50:00 UTC from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/segment/rpki.ripe.net/1780588200</tt>.
         </t>
       </section>
 
