@@ -158,6 +158,9 @@ version="3">
            <dt>ErikPartition</dt>
            <dd>An ordered listing of the manifest objects' hashes, manifestNumber values, thisUpdate values, and their certificates' SIA extension values.</dd>
 
+           <dt>ErikSegmentIndex</dt>
+           <dd>An ordered listing of the relay's segment buffers and associated ErikIndex objects object hashes.</dd>
+
         </dl>
       </section>
 
@@ -213,7 +216,7 @@ BEGIN
 -- EXPORTS ALL --
 
 IMPORTS
-  CONTENT-TYPE, Digest, DigestAlgorithmIdentifier
+  CONTENT-TYPE, ContentSet, Digest, DigestAlgorithmIdentifier
   FROM CryptographicMessageSyntax-2010 -- in [RFC6268]
   { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
     pkcs-9(9) smime(16) modules(0) id-mod-cms-2009(58) }
@@ -222,15 +225,16 @@ IMPORTS
   FROM PKIX1Implicit-2009 -- in [RFC5912]
   { iso(1) identified-organization(3) dod(6) internet(1) security(5)
     mechanisms(5) pkix(7) id-mod(0) id-mod-pkix1-implicit-02(59) }
-;
+  ;
 
 ContentInfo ::= SEQUENCE {
   contentType      CONTENT-TYPE.&id({ContentSet}),
   content      [0] EXPLICIT
-                     CONTENT-TYPE.&Type({ContentSet}{@contentType}) }
+                   CONTENT-TYPE.&Type({ContentSet}{@contentType}) }
 
 ContentSet CONTENT-TYPE ::= {
-  ct-rpkiErikIndex | ct-rpkiErikPartition | ct-rpkiErikSegmentIndex | ... }
+  CryptographicMessageSyntax-2010.ContentSet | ct-rpkiErikIndex |
+  ct-rpkiErikPartition | ct-rpkiErikSegmentIndex, ... }
 
 ct-rpkiErikIndex CONTENT-TYPE ::=
   { TYPE ErikIndex IDENTIFIED BY id-ct-rpkiErikIndex }
@@ -250,8 +254,8 @@ ct-rpkiErikSegmentIndex CONTENT-TYPE ::=
   { TYPE ErikSegmentIndex IDENTIFIED BY id-ct-rpkiErikSegmentIndex }
 
 id-ct-rpkiErikSegmentIndex OBJECT IDENTIFIER ::=
-  { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
-    pkcs-9(9) id-smime(16) id-ct(1) erikSegmentIndex(TBD) }
+  { iso(1) identified-organization(3) dod(6) internet(1) private(4)
+    enterprise(1) snijders(41948) eriksegmentindex(828) } -- TEMP OID
 
 ErikIndex ::= SEQUENCE {
   version [0]      INTEGER DEFAULT 0,
@@ -291,8 +295,8 @@ ErikSegmentIndex ::= SEQUENCE {
 ub-Segments INTEGER ::= 36
 
 SegmentRef ::= SEQUENCE {
-  segment         GeneralizedTime,
-  erikIndexHash   Digest }
+  segment          GeneralizedTime,
+  index            Digest }
 
 <CODE ENDS>
 END]]>
@@ -321,6 +325,10 @@ END]]>
         <name>ErikIndex</name>
         <t>
           An ErikIndex represents all current manifest objects available under a given FQDN and thus the complete state of the repository as it is known to the relay.
+        </t>
+
+        <t>
+          See <xref target="ex_index"/> for an example <tt>ErikIndex</tt> object.
         </t>
 
         <section title="The version field">
@@ -366,7 +374,6 @@ END]]>
             Information elements are unique with respect to one another and sorted in ascending order of the hash.
           </t>
         </section>
-
       </section>
 
       <section anchor="asn1-partition">
@@ -375,6 +382,10 @@ END]]>
           An ErikPartition represents the set of manifest objects under a given FQDN which have the same first octet of the Authority Key Identifier (AKI) in common with each other.
           Each ErikPartition is an ordered listing of <tt>ManifestRef</tt> instances which contain the manifest objects' hashes, object sizes, AKI, manifestNumber values, thisUpdate values, and their respective end-entity certificates' SIA extension values.
           Using the first octet of the AKI as the partition key facilitates even and deterministic distribution of ManifestRefs across ErikPartitions.
+        </t>
+
+        <t>
+          See <xref target="ex_part"/> for an example <tt>ErikPartition</tt> object.
         </t>
 
         <section title="The version field">
@@ -416,12 +427,17 @@ END]]>
             Information elements are unique with respect to one another and sorted in ascending order of the hash.
           </t>
         </section>
+
       </section>
 
       <section anchor="asn1-segmentindex">
         <name>ErikSegmentIndex</name>
         <t>
           An <tt>ErikSegmentIndex</tt> represents segments that contain RPKI objects that a relay discovered in a short time window.
+        </t>
+
+        <t>
+          See <xref target="ex_segidx"/> for an example <tt>ErikSegmentIndex</tt> object.
         </t>
 
         <section title="The version field">
@@ -470,7 +486,6 @@ END]]>
             Information elements are unique with respect to one another and sorted in ascending order of the <tt>segment</tt> identifier.
           </t>
         </section>
-
       </section>
 
     </section>
@@ -530,8 +545,6 @@ END]]>
         </t>
         <t>
           A client <bcp14>MAY</bcp14> use the <tt>If-Modified-Since</tt> HTTP header when fetching <tt>ErikIndex</tt> objects.
-        </t>
-        <t>
           Responses to requests for paths starting with <tt>/.well-known/erik/index/</tt> are mutable.
         </t>
       </section>
@@ -552,12 +565,12 @@ END]]>
       <section>
         <name>General Structure of Prefetch Responses</name>
         <t>
-          In this protocol, a Prefetch Response (PR) is simply a concatenated sequence of zero or more DER-encoded objects in <xref target="RFC1952">gzip</xref> compressed form.
+          In this protocol, a Prefetch Response (PR) is simply a concatenated sequence of zero or more DER-encoded objects.
           Because DER-encoded objects are self-delimiting, no marker is used between the objects and there is no end-of-sequence indicator.
           <!-- FYI - I don't consider this a problem, but this also means that if any objects in the prefetching stream are not well-formed, it may not be possible to reliably decode the rest of the stream. -->
         </t>
         <t>
-          A Prefetch Response is non-deterministic: objects contained within the PR may appear in arbitrary order or in duplicate.
+          A PR is non-deterministic: objects contained within the PR may appear in arbitrary order or in duplicate.
           A PR may contain RPKI signed objects, <tt>ErikIndex</tt> objects, and <tt>ErikPartition</tt> objects.
           The set of objects in a PR need not be self-consistent or complete from the perspective of top-down validation.
           PRs merely serve to reduce network traffic by prefill unvalidated cache areas.
@@ -574,37 +587,59 @@ END]]>
       </section>
 
       <section anchor="snappf">
-        <name>Prefetching FQDN Snapshots</name>
+        <name>Prefetching Using Snapshot Buffers</name>
         <t>
-          A snapshot contains all RPKI &amp; Erik objects a relay associated with a given FQDN as of the time of the snapshot's production.
-          Snapshots are not necessarily produced in lockstep with updates to the relay's merkle trees, therefore clients <bcp14>MUST</bcp14> perform a tree comparison after fetching a snapshot.
+          A snapshot buffer contains all RPKI &amp; Erik objects a relay associated with a given FQDN as of the time of the snapshot's production.
+          Snapshot buffers are not necessarily produced in lockstep with updates to the relay's merkle trees, therefore clients <bcp14>MUST</bcp14> perform a tree comparison after fetching a snapshot buffer.
         </t>
         <t>
-          As an example, the URI to fetch a snapshot for the <tt>rpki.ripe.net</tt> FQDN from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/snapshot/rpki.ripe.net</tt>.
+          To avoid wasting resources, relays <bcp14>SHOULD NOT</bcp14> delay snapshot buffer production by more than one hour.
+        </t>
+        <t>
+          As an example, the URI to fetch a snapshot buffer for the <tt>rpki.ripe.net</tt> FQDN from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/snapshot/rpki.ripe.net</tt>.
           Responses to requests for paths starting with <tt>/.well-known/erik/snapshot/</tt> are mutable.
         </t>
         <t>
-          Relays MUST NOT include <tt>ErikIndex</tt> and <tt>ErikPartition</tt> objects in snapshots.
-        </t>
-        <t>
-          See <xref target="mksnap"/> for an example how to construct a FQDN snapshot.
+          To avoid wasting resources, relays <bcp14>SHOULD NOT</bcp14> include <tt>ErikIndex</tt>, <tt>ErikPartition</tt>, and <tt>ErikSegmentIndex</tt> objects in snapshot buffers.
+          Clients <bcp14>MUST</bcp14> discard any <tt>ErikIndex</tt>, <tt>ErikPartition</tt>, and <tt>ErikSegmentIndex</tt> objects contained in snapshot buffers.
         </t>
       </section>
 
       <section anchor="segmentpf">
-        <name>Prefetching Segments</name>
+        <name>Prefetching Using Segment Buffers</name>
         <t>
-          Segments buffers form an append-only log which contains all signed RPKI objects, ErikIndex objects, and ErikPartition objects the relay discovered in the last few hours.
+          Segment buffers form an append-only log which contains the signed RPKI objects, ErikIndex objects, and ErikPartition objects a relay discovered in the last few hours for a given FQDN.
+        </t>
+        <t>
           Relay implementations are <bcp14>RECOMMENDED</bcp14> to start a new segment buffer every 5 minutes.
         </t>
         <t>
-          The URIs to fetch segments are constructed by transforming the <tt>segmentTime</tt> (<xref target="segmentTime"/>) to integer representation.
-          The integer value is the number of seconds, excluding leap seconds, after midnight UTC, January 1, 1970.
-          Responses to requests for paths starting with <tt>/.well-known/erik/segment/</tt> are mutable.
+          A client starts by fetching the <tt>ErikSegmentIndex</tt> (<xref target="asn1-segmentindex"/>) to discover the available segment buffers on the relay.
         </t>
-        <t>
-          As an example, the URI to fetch the segment for <tt>rpki.ripe.net</tt> starting at Jun 4th, 2026, 15:50:00 UTC from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/segment/rpki.ripe.net/1780588200</tt>.
-        </t>
+
+        <section title="Segment Discovery">
+          <t>
+            The URIs to fetch <tt>ErikSegmentIndex</tt> objects can be constructed using the following Well-Known URI template with the relay's hostname as authority, the <tt>erik</tt> keyword as suffix, the string <tt>/segmentindex/</tt>, followed by a FQDN as parameter, i.e.: <tt>https://{relay_hostname}/.well-known/erik/segmentindex/{FQDN}</tt>.
+          </t>
+          <t>
+            As an example, the URI to fetch an <tt>ErikSegmentIndex</tt> for the <tt>rpki.ripe.net</tt> FQDN from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/segmentindex/rpki.ripe.net</tt>.
+          </t>
+          <t>
+            A client <bcp14>MAY</bcp14> use the <tt>If-Modified-Since</tt> HTTP header when fetching <tt>ErikSegmentIndex</tt> objects.
+            Responses to requests for paths starting with <tt>/.well-known/erik/segmentindex/</tt> are mutable.
+          </t>
+        </section>
+
+        <section title="Segment Buffers">
+          <t>
+            The URIs to fetch the segment buffers are constructed by transforming the <tt>segmentTime</tt> (<xref target="segmentTime"/>) to integer representation.
+            The integer value is the number of seconds, excluding leap seconds, after midnight UTC, January 1, 1970.
+            Responses to requests for paths starting with <tt>/.well-known/erik/segment/</tt> are mutable.
+          </t>
+          <t>
+            As an example, the URI to fetch the segment buffer for <tt>rpki.ripe.net</tt> starting at Jun 4th, 2026, 15:50:00 UTC from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/segment/rpki.ripe.net/1780588200</tt>.
+          </t>
+        </section>
       </section>
 
     </section>
@@ -680,6 +715,7 @@ END]]>
 
     <section anchor="operational">
       <name>Operational Considerations</name>
+
       <section>
         <name>Scaling considerations</name>
         <t>
@@ -689,18 +725,21 @@ END]]>
           This order of magnitude in terms of scaling requirements can easily be handled by a single commodity server.
         </t>
       </section>
+
       <section>
         <name>HTTP Compression</name>
         <t>
-          Using gzip compression on average tends to yield a 20% reduction in RPKI object size when fetching individual objects, therefore it is <bcp14>RECOMMENDED</bcp14> for clients and relays to offer support for compressed content coding, as described in <xref target="RFC9110" section="8.4.1"/>.
-          Prefetch responses (<xref target="prefetching"/>) are always in gzip compressed form.
+          Using gzip compression on average tends to yield a 20% reduction in size when fetching individual objects and 50% for Prefetch responses.
+          Therefore, clients <bcp14>MUST</bcp14> support gzip content coding (<xref target="RFC9110" section="8.4.1.3"/>) and the server <bcp14>MAY</bcp14> assume it without explicit negotiation.
+          Clients <bcp14>SHOULD</bcp14> send an <tt>Accept-Encoding</tt> header field in the request, which permits the negotiation of other compression schemes as well.
         </t>
         <t>
-          Using a previous version of a RPKI object as a compression dictionary for a newer version enables delivery of a delta-compressed version of the changes, usually resulting in significantly smaller responses than what can be achieved by compression alone.
+          Using a previous version of a RPKI object as a compression dictionary for a newer version enables delivery of a delta-compressed version of the changes, usually resulting in significantly smaller responses than what can be achieved by regular compression alone.
           Clients can facilitate delta compression by sending an <tt>Available-Dictionary</tt> request header, using a previously fetched version of the RPKI object as the dictionary.
           It is <bcp14>RECOMMENDED</bcp14> for clients and relays to make use of Compression Dictionary Transport (<xref target="RFC9842"/>).
         </t>
       </section>
+
     </section>
 
     <section anchor="security">
@@ -716,10 +755,10 @@ END]]>
         See <xref target="RFC8182" section="5"/> for more security considerations.
       </t>
       <t>
-        To avoid certain forms of replay attack, clients <bcp14>MUST</bcp14> verify purported <tt>indexScope</tt>, <tt>ManifestRef</tt> location values, and manifest Subject Information Access (SIA) extensions match the expected FQDN.
+        To avoid certain forms of attack, clients <bcp14>MUST</bcp14> check whether <tt>indexScope</tt>, <tt>segmentScope</tt>, <tt>ManifestRef</tt> location values, and manifest Subject Information Access (SIA) extensions match the expected FQDN.
       </t>
       <t>
-        Byzantine events or faults in relay-to-client communication can be overcome by the client rotating requests for objects among different Erik relays.
+        Byzantine events or faults in relay-to-client communication can be overcome by the client rotating requests for objects among different relays.
       </t>
     </section>
 
@@ -754,6 +793,9 @@ Decimal  Description                 References
         </artwork>
         <t>
           Upon publication of this document, IANA is requested to reference the RFC publication instead of this draft.
+        </t>
+        <t>
+          For the current proof-of-concept phase the id-ct-rpkiErikSegmentIndex OID was assigned from a PEN arc.
         </t>
       </section>
 
@@ -963,7 +1005,7 @@ Decimal  Description                 References
           <front>
             <title>rpkitouch</title>
             <author fullname="Job Snijders"/>
-            <date month="December" year="2025" />
+            <date month="July" year="2026" />
           </front>
         </reference>
 
@@ -1012,15 +1054,16 @@ Decimal  Description                 References
         <name>Experimental Erik Relay Services</name>
         <t>
           A few experimental Erik relays are available, each running on slightly different schedules.
-          Client implementers are encouraged to round-robin between these instances to observe results.
+          Client implementers are encouraged to observe results using these instances via round-robin or concurrent access.
         </t>
+
         <dl>
           <dt><tt>http://relay.rpki-servers.org/</tt></dt>
           <dd>Dublin, Osaka, Sydney - anycasted distributed computing cluster</dd>
-
+ 
           <dt><tt>http://dub.rpki-servers.org/</tt></dt>
           <dd>Dublin, Ireland, - distributed computing cluster (6 machines, NFS backend)</dd>
-
+ 
           <dt><tt>http://atl.rpki-servers.org/</tt></dt>
           <dd>Atlanta, USA, - distributed computing cluster (2 machines, NFS backend)</dd>
 
@@ -1029,7 +1072,7 @@ Decimal  Description                 References
 
           <dt><tt>http://nyc.rpki-servers.org/</tt></dt>
           <dd>New York, USA, - single node</dd>
-
+ 
           <dt><tt>http://fnllwqoupfrhso6643whm6lpkgsftjtc6crpehmyz2o7pffirnqy7rad.onion/</tt></dt>
           <dd>Erik relay service via Tor</dd>
         </dl>
@@ -1068,33 +1111,14 @@ Decimal  Description                 References
         </t>
         <sourcecode anchor="ex_part" type="base64" src="AZmwyRKvBFv4DPl2g5IAhM8BbDvVWzZvgBLjORCoXqM.b64"/>
       </section>
-    </section>
 
-    <section anchor="mksnap">
-      <name>Producing a FQDN Snapshot</name>
-      <t>
-        The following terminal transcript illustrates how one could prepare a Prefetch Response for <tt>rpki.ripe.net</tt> using common command line utilities.
-      </t>
-<sourcecode type="shell" markers="false">
-<![CDATA[
-$ cd /var/cache/rpki-client/rpki.ripe.net/
-$ export TMP="$(mktemp)"
-$ find . -type f | xargs -r cat -- | gzip > "${TMP}"
-$ mv "${TMP}" /var/www/htdocs/erik/snapshot/rpki.ripe.net
-$ unset TMP
-
-$ cd /var/www/htdocs/erik/snapshot/
-
-$ ls -nl rpki.ripe.net
--rw-r--r--  1 1000  0  98392415 Dec 12 15:59 rpki.ripe.net
-
-$ file rpki.ripe.net
-rpki.ripe.net: gzip compressed data, from Unix
-
-$ gzcat rpki.ripe.net | openssl asn1parse -inform DER | grep -c :d=0
-109880
-]]>
-</sourcecode>
+      <section>
+        <name>Example ErikSegmentIndex</name>
+        <t>
+          This object was retrieved from <tt>https://miso.sobornost.net/.well-known/erik/segmentindex/rpki.apnic.net</tt>.
+        </t>
+        <sourcecode anchor="ex_segidx" type="base64" src="rpki.apnic.net.b64"/>
+      </section>
     </section>
 
     <section anchor="acknowledgements" numbered="false">
@@ -1110,8 +1134,9 @@ $ gzcat rpki.ripe.net | openssl asn1parse -inform DER | grep -c :d=0
           <contact fullname="Theo Buehler"/>,
           <contact fullname="William McCall"/>,
           <contact fullname="Jasdip Singh"/>,
-          and
           <contact fullname="Michael Hollyman"/>,
+          and
+          <contact fullname="Mike Bishop"/>
         for the lovely conversations that led to this proposal.
         The authors wish to thank <contact fullname="Sean Turner"/> and <contact fullname="Russ Housley"/> for their review of the ASN.1 notation.
       </t>
