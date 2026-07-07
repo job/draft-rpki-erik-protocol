@@ -298,8 +298,9 @@ SegmentRef ::= SEQUENCE {
   segment          GeneralizedTime,
   index            Digest }
 
+END
 <CODE ENDS>
-END]]>
+]]>
 </sourcecode>
 
       <section anchor="genstructure">
