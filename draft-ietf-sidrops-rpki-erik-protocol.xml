@@ -254,8 +254,8 @@ ct-rpkiErikSegmentIndex CONTENT-TYPE ::=
   { TYPE ErikSegmentIndex IDENTIFIED BY id-ct-rpkiErikSegmentIndex }
 
 id-ct-rpkiErikSegmentIndex OBJECT IDENTIFIER ::=
-  { iso(1) identified-organization(3) dod(6) internet(1) private(4)
-    enterprise(1) snijders(41948) eriksegmentindex(828) } -- TEMP OID
+  { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+    pkcs-9(9) id-smime(16) id-ct(1) erikSegmentIndex(59) }
 
 ErikIndex ::= SEQUENCE {
   version [0]      INTEGER DEFAULT 0,
@@ -789,14 +789,11 @@ Decimal  Description                 References
 ----------------------------------------------------
    55    id-ct-rpkiErikIndex         [this_document]
    56    id-ct-rpkiErikPartition     [this_document]
-  TBD    id-ct-rpkiErikSegmentIndex  [this_document]
+   59    id-ct-rpkiErikSegmentIndex  [this_document]
 ]]>
         </artwork>
         <t>
           Upon publication of this document, IANA is requested to reference the RFC publication instead of this draft.
-        </t>
-        <t>
-          For the current proof-of-concept phase the id-ct-rpkiErikSegmentIndex OID was assigned from a PEN arc.
         </t>
       </section>
 
@@ -1116,9 +1113,9 @@ Decimal  Description                 References
       <section>
         <name>Example ErikSegmentIndex</name>
         <t>
-          This object was retrieved from <tt>https://miso.sobornost.net/.well-known/erik/segmentindex/rpki.apnic.net</tt>.
+          This object was retrieved from <tt>https://miso.sobornost.net/.well-known/erik/segmentindex/rpki.ripe.rnet</tt>.
         </t>
-        <sourcecode anchor="ex_segidx" type="base64" src="rpki.apnic.net.b64"/>
+        <sourcecode anchor="ex_segidx" type="base64" src="segmentindex.example.b64"/>
       </section>
     </section>
 
