@@ -138,7 +138,7 @@ version="3">
         <name>Glossary</name>
         <t>
           This section describes the terminology and abbreviations used in this document.
-          Though the definitions might not be clear on a first read, later on the terms will be introduce with more detail.
+          Though the definitions might not be clear on a first read, later on the terms will be introduced with more detail.
         </t>
 
         <dl>
@@ -147,7 +147,7 @@ version="3">
            <dd>An intermediate between CA publication repositories and Relying Parties.</dd>
 
            <dt>FQDN</dt>
-           <dd>The fully qualified domain name of a RPKI repository instance referenced in an end-entity certificate's Subject Information Access (SIA) extension's id-ad-signedObject accessDescription.</dd>
+           <dd>The fully qualified domain name of an RPKI repository instance referenced by the mandatory rsync URI in an end-entity certificate's Subject Information Access (SIA) extension's id-ad-signedObject accessDescription.</dd>
 
            <dt>Hash</dt>
            <dd>A message digest calculated for an object using the SHA-256 algorithm.</dd>
@@ -311,13 +311,13 @@ END
         <section>
           <name>contentType</name>
           <t>
-            The <tt>contentType</tt> is an OID specifying the type of payload in the object, in this profile either <tt>id-ct-rpkiErikIndex</tt> or <tt>id-ct-rpkiErikPartition</tt>.
+            The <tt>contentType</tt> is an OID specifying the type of payload in the object, in this profile either <tt>id-ct-rpkiErikIndex</tt>, <tt>id-ct-rpkiErikPartition</tt>, or <tt>id-ct-rpkiErikSegmentIndex</tt>.
           </t>
         </section>
         <section>
           <name>content</name>
           <t>
-            The <tt>content</tt> field contains an instance of <tt>ErikIndex</tt> or <tt>ErikPartition</tt>.
+            The <tt>content</tt> field contains an instance of <tt>ErikIndex</tt>, <tt>ErikPartition</tt>, or <tt>ErikSegmentIndex</tt>.
           </t>
         </section>
       </section>
@@ -481,7 +481,7 @@ END
           <t>
             A <tt>SegmentRef</tt> is a SEQUENCE consisting of a segment identifier and a hash.
             The segment identifier is expressed as a <tt>GeneralizedTime</tt> and indicates the moment in time the segment was initialized.
-            The hash in the <tt>erikIndexHash</tt> field is the message digest calculated over the last <tt>ErikIndex</tt> associated with the segment.
+            The hash in the <tt>index</tt> field is the message digest calculated over the last <tt>ErikIndex</tt> associated with the segment.
           </t>
           <t>
             Information elements are unique with respect to one another and sorted in ascending order of the <tt>segment</tt> identifier.
@@ -494,7 +494,12 @@ END
     <section anchor="rp">
       <name>Client-side Processing</name>
       <t>
-        Clients start by acquiring and processing an <tt>ErikIndex</tt>, which represents the relay's current Merkle tree head for a given FQDN.
+        During top-down RPKI certificate validation, clients recursively determine the FQDNs for which ErikIndex objects need to be acquired.
+        For example, when processing a CA certificate, a client can derive the FQDN from the host component of the rsync URI in the certificate's id-ad-rpkiManifest AccessDescription.
+        If the FQDN has not yet been processed, the client proceeds with Erik synchronization for that FQDN as described below.
+      </t>
+      <t>
+        For each such FQDN, clients acquire and process an <tt>ErikIndex</tt>, which represents the relay's current Merkle tree head for a given FQDN.
         A client <bcp14>MUST</bcp14> verify the requested FQDN exactly matches the <tt>indexScope</tt> value in the <tt>ErikIndex</tt>, and if not proceed to use a different relay.
       </t>
       <t>
