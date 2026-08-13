@@ -78,6 +78,7 @@ version="3">
       <t>
         This document specifies the Erik Synchronization Protocol for use with the Resource Public Key Infrastructure (RPKI).
         Erik Synchronization can be characterized as a data replication system using Merkle trees, a content-addressable naming scheme, concurrency control using monotonically increasing sequence numbers, and HTTP transport.
+        The protocol is used to interact with Erik Relays, a new intermediary layer in the RPKI supply chain that exists between the Repository Publication Point and Relying Parties, enabling better scalability.
         Relying Parties can combine information retrieved via Erik Synchronization with other RPKI transport protocols.
         The protocol's design is intended to be efficient, fast, easy to implement, and robust in the face of partitions or faults in the network.
       </t>
@@ -92,6 +93,7 @@ version="3">
       <t>
         This document specifies the Erik Synchronization Protocol for use with the Resource Public Key Infrastructure (RPKI) <xref target="RFC6480"/>.
         Erik Synchronization can be characterized as a data replication system using Merkle trees <xref target="M1987"/>, a content-addressable naming scheme <xref target="RFC6920"/>, concurrency control using monotonically increasing sequence numbers <xref target="RFC0677"/>, and HTTP transport <xref target="RFC9110"/>.
+        The protocol is used to interact with Erik Relays, a new intermediary layer in the RPKI supply chain that exists between the Repository Publication Point and Relying Parties, enabling better scalability.
         Relying Parties can combine information retrieved via Erik Synchronization with other RPKI transport protocols (<xref target="RFC5781"/> and <xref target="RFC8182"/>).
         The protocol's design is intended to be efficient, fast, easy to implement <xref target="RFC1925"/>, and robust in the face of partitions or faults in the network.
       </t>
@@ -177,7 +179,7 @@ version="3">
         In this synchronization protocol, Merkle trees are used to determine whether differences exist between client and relay.
         Merkle trees are hierarchical data structures: the hash value of each node is computed recursively by hashing the concatenated hash values of the node's children.
         The hash of the ErikIndex represents the entire dataset related to a given FQDN.
-        If the ErikIndex hash is not the same between two replicas, the relay provides the client with hashes of smaller and smaller portions of the to-be-replicated dataset until the exact list of out-of-sync or missing objects is identified.
+        If the ErikIndex hash is not the same between two replicas, the relay provides the client with 256 <tt>ErikPartition</tt> hashes to identify out-of-sync or missing objects referenced in particular partitions.
         Sequence numbers are then used to determine whether these differences are relevant enough for the client to fetch.
         All data, except for ErikIndex objects, is fetched using static addresses derived from object hashes.
         This approach reduces unnecessary data transfer between caches which contain mostly similar data.
@@ -370,6 +372,7 @@ END
             This field is a sequence of <tt>PartitionRef</tt> instances.
             There is one <tt>PartitionRef</tt> for each current ErikPartition.
             Each <tt>PartitionRef</tt> is a tuple consisting of the hash of the partition object and the size of the partition object.
+            The fixed maximum size of the <tt>partitionList</tt> of 256 partitions scales efficiently because partitions track aggregate Manifest objects rather than tracking individual, separate RPKI objects.
           </t>
           <t>
             Information elements are unique with respect to one another and sorted in ascending order of the hash.
@@ -438,7 +441,7 @@ END
         </t>
 
         <t>
-          See <xref target="ex_segidx"/> for an example <tt>ErikSegmentIndex</tt> object.
+          See <xref target="segmentpf"/> on how these are used and <xref target="ex_segidx"/> for an example <tt>ErikSegmentIndex</tt> object.
         </t>
 
         <section title="The version field">
@@ -521,12 +524,30 @@ END
     <section anchor="querying">
       <name>Querying an Erik Relay</name>
 
+      <t>
+        Client-side retrieval requires nothing other than the <tt>GET</tt> request method (<xref targt="RFC9110" section="9.3.1"/>).
+      </t>
+
+      <section title="Fetching ErikIndex objects">
+        <t>
+          The URIs to fetch ErikIndex objects can be constructed using the following Well-Known URI template with the relay's hostname as authority, the <tt>erik</tt> keyword as suffix, the string <tt>/index/</tt>, followed by a FQDN as parameter, i.e.: <tt>https://{relay_hostname}/.well-known/erik/index/{FQDN}</tt>.
+        </t>
+        <t>
+          As an example, the URI to fetch an <tt>ErikIndex</tt> for the <tt>rpki.ripe.net</tt> FQDN from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/index/rpki.ripe.net</tt>.
+        </t>
+        <t>
+          Clients <bcp14>SHOULD</bcp14> use conditional <tt>GET</tt> requests (<xref target="RFC9110" section="13"/>) for fetching <tt>ErikIndex</tt> objects, because <tt>HEAD</tt> requests incur a latency penalty due to redundant round-trips.
+          Responses to requests for paths starting with <tt>/.well-known/erik/index/</tt> are mutable.
+        </t>
+      </section>
+
       <section title="Fetching objects by hash">
         <t>
           This specification uses "Named Information" identifiers mapped to <tt>.well-known</tt> HTTP/HTTPS URLs for object retrieval, as described in <xref target="RFC6920"/>.
         </t>
         <t>
           For example, issuance <tt>#54</tt> of <tt>ripe-ncc-ta.mft</tt> has the following SHA256 digest: <tt>c2d0427bc5a32c42eea1ab5663d592b1fc29c7d4ef16ab0b5e1d631d039dcc21</tt>.
+          The aforementioned digest encoded using base64url encoding is <tt>wtBCe8WjLELuoatWY9WSsfwpx9TvFqsLXh1jHQOdzCE</tt>.
         </t>
         <t>
           To fetch the aforementioned object from an relay hosted at <tt>relay.example.net</tt>, a client would access the following HTTP URL:
@@ -537,26 +558,12 @@ END
         </t>
       </section>
 
-      <section title="Fetching ErikIndex objects">
-        <t>
-          The URIs to fetch ErikIndex objects can be constructed using the following Well-Known URI template with the relay's hostname as authority, the <tt>erik</tt> keyword as suffix, the string <tt>/index/</tt>, followed by a FQDN as parameter, i.e.: <tt>https://{relay_hostname}/.well-known/erik/index/{FQDN}</tt>.
-        </t>
-        <t>
-          As an example, the URI to fetch an <tt>ErikIndex</tt> for the <tt>rpki.ripe.net</tt> FQDN from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/index/rpki.ripe.net</tt>.
-        </t>
-        <t>
-          A client <bcp14>MAY</bcp14> use the <tt>If-Modified-Since</tt> HTTP header when fetching <tt>ErikIndex</tt> objects.
-          Responses to requests for paths starting with <tt>/.well-known/erik/index/</tt> are mutable.
-        </t>
-      </section>
-
     </section>
 
     <section anchor="prefetching">
       <name>Prefetching Objects in Bulk</name>
       <t>
-        Object prefetching is a bulk distribution mechanism for data that clients might need in the near future.
-        Prefetching is useful for efficiently bootstrapping empty caches and for clients to catch up on recently discovered objects through fewer requests.
+        Object prefetching is a bulk distribution mechanism useful for efficiently bootstrapping empty caches and for clients to catch up on recently discovered objects through fewer requests.
       </t>
 
       <t>
@@ -590,7 +597,7 @@ END
       <section anchor="snappf">
         <name>Prefetching Using Snapshot Buffers</name>
         <t>
-          A snapshot buffer contains all RPKI &amp; Erik objects a relay associated with a given FQDN as of the time of the snapshot's production.
+          A snapshot buffer contains all signed objects a relay associated with a given FQDN as of the time of the snapshot's production.
           Snapshot buffers are not necessarily produced in lockstep with updates to the relay's merkle trees, therefore clients <bcp14>MUST</bcp14> perform a tree comparison after fetching a snapshot buffer.
         </t>
         <t>
@@ -1133,8 +1140,9 @@ Decimal  Description                 References
           <contact fullname="William McCall"/>,
           <contact fullname="Jasdip Singh"/>,
           <contact fullname="Michael Hollyman"/>,
+          <contact fullname="Mike Bishop"/>,
           and
-          <contact fullname="Mike Bishop"/>
+          , <contact fullname="Kamiel Braet"/>
         for the lovely conversations that led to this proposal.
         The authors wish to thank <contact fullname="Sean Turner"/> and <contact fullname="Russ Housley"/> for their review of the ASN.1 notation.
       </t>
