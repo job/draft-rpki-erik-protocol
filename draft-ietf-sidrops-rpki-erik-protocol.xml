@@ -1133,16 +1133,17 @@ Decimal  Description                 References
       </t>
       <t>
         The authors wish to thank
-          <contact fullname="George Michaelson"/>,
-          <contact fullname="Theo de Raadt"/>,
-          <contact fullname="Bob Beck"/>,
-          <contact fullname="Theo Buehler"/>,
-          <contact fullname="William McCall"/>,
-          <contact fullname="Jasdip Singh"/>,
-          <contact fullname="Michael Hollyman"/>,
-          <contact fullname="Mike Bishop"/>,
-          and
+          <contact fullname="George Michaelson"/>
+          , <contact fullname="Theo de Raadt"/>
+          , <contact fullname="Bob Beck"/>
+          , <contact fullname="Theo Buehler"/>
+          , <contact fullname="William McCall"/>
+          , <contact fullname="Jasdip Singh"/>
+          , <contact fullname="Michael Hollyman"/>
+          , <contact fullname="Mike Bishop"/>
           , <contact fullname="Kamiel Braet"/>
+          and
+          , <contact fullname="Loganaden Velvindron"/>
         for the lovely conversations that led to this proposal.
         The authors wish to thank <contact fullname="Sean Turner"/> and <contact fullname="Russ Housley"/> for their review of the ASN.1 notation.
       </t>
