@@ -740,6 +740,16 @@ END
       </section>
 
       <section>
+        <name>HTTP Version Recommendations</name>
+        <t>
+          In this protocol clients might need to retrieve many individual objects simultaneously from relays.
+          In non-multiplexed transports like HTTP/1.1 (<xref target="RFC9112"/>) concurrent fetching means either establishing many parallel TCP connections or serializing requests over a single connection which might lead to head-of-line blocking, connection exhaustion, and substantial performance degradation.
+          In contrast, HTTP/2 (<xref target="RFC9113"/>) and HTTP/3 (<xref target="RFC9114"/>) natively support stream multiplexing (discussed in <xref target="RFC9205" section="4.11"/>) and field/header compression (HPACK <xref target="RFC7541"/>, QPACK <xref target="RFC9204"/>).
+          Therefore use of HTTP/2 and HTTP/3 is <bcp14>RECOMMENDED</bcp14> to facilitate high-concurrency, low-latency object retrieval.
+        </t>
+      </section>
+
+      <section>
         <name>HTTP Compression</name>
         <t>
           Using gzip compression on average tends to yield a 20% reduction in size when fetching individual objects and 50% for Prefetch responses.
@@ -966,6 +976,13 @@ Decimal  Description                 References
 
       <references>
         <name>Informative References</name>
+
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.7541.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.9204.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.9205.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.9112.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.9113.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.9114.xml"/>
 
         <reference anchor="M1987" quoteTitle="true" target="https://doi.org/10.1007/3-540-48184-2_32" derivedAnchor="M1987">
           <front>
