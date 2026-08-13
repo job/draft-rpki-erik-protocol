@@ -525,7 +525,7 @@ END
       <name>Querying an Erik Relay</name>
 
       <t>
-        Client-side retrieval requires nothing other than the <tt>GET</tt> request method (<xref targt="RFC9110" section="9.3.1"/>).
+        Client-side retrieval requires nothing other than the <tt>GET</tt> request method (<xref target="RFC9110" section="9.3.1"/>).
       </t>
 
       <section title="Fetching ErikIndex objects">
