@@ -1147,8 +1147,9 @@ Decimal  Description                 References
           , <contact fullname="Michael Hollyman"/>
           , <contact fullname="Mike Bishop"/>
           , <contact fullname="Kamiel Braet"/>
-          and
           , <contact fullname="Loganaden Velvindron"/>
+          and
+          , <contact fullname="Lancheng Qin"/>
         for the lovely conversations that led to this proposal.
         The authors wish to thank <contact fullname="Sean Turner"/> and <contact fullname="Russ Housley"/> for their review of the ASN.1 notation.
       </t>
