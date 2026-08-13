@@ -498,7 +498,7 @@ END
       <name>Client-side Processing</name>
       <t>
         During top-down RPKI certificate validation, clients recursively determine the FQDNs for which ErikIndex objects need to be acquired.
-        For example, when processing a CA certificate, a client can derive the FQDN from the host component of the rsync URI in the certificate's id-ad-rpkiManifest AccessDescription.
+        For example, when processing a CA certificate, a client can derive the FQDN from the host component of the rsync URI in the certificate's <tt>id-ad-rpkiManifest</tt> <tt>AccessDescription</tt>.
         If the FQDN has not yet been processed, the client proceeds with Erik synchronization for that FQDN as described below.
       </t>
       <t>
