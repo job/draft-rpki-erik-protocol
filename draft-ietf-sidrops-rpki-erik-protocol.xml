@@ -140,7 +140,7 @@ version="3">
         <name>Glossary</name>
         <t>
           This section describes the terminology and abbreviations used in this document.
-          Though the definitions might not be clear on a first read, later on the terms will be introduce with more detail.
+          Though the definitions might not be clear on a first read, later on the terms will be introduced with more detail.
         </t>
 
         <dl>
@@ -550,7 +550,7 @@ END
           The aforementioned digest encoded using base64url encoding is <tt>wtBCe8WjLELuoatWY9WSsfwpx9TvFqsLXh1jHQOdzCE</tt>.
         </t>
         <t>
-          To fetch the aforementioned object from an relay hosted at <tt>relay.example.net</tt>, a client would access the following HTTP URL:
+          To fetch the aforementioned object from a relay hosted at <tt>relay.example.net</tt>, a client would access the following HTTP URL:
           <tt>https://relay.example.net/.well-known/ni/sha-256/wtBCe8WjLELuoatWY9WSsfwpx9TvFqsLXh1jHQOdzCE</tt>
         </t>
         <t>
