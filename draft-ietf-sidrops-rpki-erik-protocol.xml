@@ -538,7 +538,10 @@ END
           The URIs to fetch ErikIndex objects can be constructed using the following Well-Known URI template with the relay's hostname as authority, the <tt>erik</tt> keyword as suffix, the string <tt>/index/</tt>, followed by a FQDN as parameter, i.e.: <tt>https://{relay_hostname}/.well-known/erik/index/{FQDN}</tt>.
         </t>
         <t>
-          As an example, the URI to fetch an <tt>ErikIndex</tt> for the <tt>rpki.ripe.net</tt> FQDN from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/index/rpki.ripe.net</tt>.
+          As an example, the URI to fetch an <tt>ErikIndex</tt> for the <tt>rpki.ripe.net</tt> FQDN from a relay at <tt>relay.example.net</tt> would be:
+        </t>
+        <t>
+          <tt>https://relay.example.net/.well-known/erik/index/rpki.ripe.net</tt>
         </t>
         <t>
           Clients <bcp14>SHOULD</bcp14> use conditional <tt>GET</tt> requests (<xref target="RFC9110" section="13"/>) for fetching <tt>ErikIndex</tt> objects, because <tt>HEAD</tt> requests incur a latency penalty due to redundant round-trips.
@@ -556,6 +559,8 @@ END
         </t>
         <t>
           To fetch the aforementioned object from a relay hosted at <tt>relay.example.net</tt>, a client would access the following HTTP URL:
+        </t>
+        <t>
           <tt>https://relay.example.net/.well-known/ni/sha-256/wtBCe8WjLELuoatWY9WSsfwpx9TvFqsLXh1jHQOdzCE</tt>
         </t>
         <t>
@@ -609,7 +614,12 @@ END
           To avoid wasting resources, relays <bcp14>SHOULD NOT</bcp14> delay snapshot buffer production by more than one hour.
         </t>
         <t>
-          As an example, the URI to fetch a snapshot buffer for the <tt>rpki.ripe.net</tt> FQDN from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/snapshot/rpki.ripe.net</tt>.
+          As an example, the URI to fetch a snapshot buffer for the <tt>rpki.ripe.net</tt> FQDN from a relay at <tt>relay.example.net</tt> would be:
+        </t>
+        <t>
+	  <tt>https://relay.example.net/.well-known/erik/snapshot/rpki.ripe.net</tt>
+        </t>
+        <t>
           Responses to requests for paths starting with <tt>/.well-known/erik/snapshot/</tt> are mutable.
         </t>
         <t>
@@ -632,10 +642,16 @@ END
 
         <section title="Segment Discovery">
           <t>
-            The URIs to fetch <tt>ErikSegmentIndex</tt> objects can be constructed using the following Well-Known URI template with the relay's hostname as authority, the <tt>erik</tt> keyword as suffix, the string <tt>/segmentindex/</tt>, followed by a FQDN as parameter, i.e.: <tt>https://{relay_hostname}/.well-known/erik/segmentindex/{FQDN}</tt>.
+            The URIs to fetch <tt>ErikSegmentIndex</tt> objects can be constructed using the following Well-Known URI template with the relay's hostname as authority, the <tt>erik</tt> keyword as suffix, the string <tt>/segmentindex/</tt>, followed by a FQDN as parameter, i.e.:
           </t>
           <t>
-            As an example, the URI to fetch an <tt>ErikSegmentIndex</tt> for the <tt>rpki.ripe.net</tt> FQDN from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/segmentindex/rpki.ripe.net</tt>.
+            <tt>https://{relay_hostname}/.well-known/erik/segmentindex/{FQDN}</tt>
+          </t>
+          <t>
+            As an example, the URI to fetch an <tt>ErikSegmentIndex</tt> for the <tt>rpki.ripe.net</tt> FQDN from a relay at <tt>relay.example.net</tt> would be:
+          </t>
+          <t>
+            <tt>https://relay.example.net/.well-known/erik/segmentindex/rpki.ripe.net</tt>
           </t>
           <t>
             A client <bcp14>MAY</bcp14> use the <tt>If-Modified-Since</tt> HTTP header when fetching <tt>ErikSegmentIndex</tt> objects.
@@ -650,7 +666,10 @@ END
             Responses to requests for paths starting with <tt>/.well-known/erik/segment/</tt> are mutable.
           </t>
           <t>
-            As an example, the URI to fetch the segment buffer for <tt>rpki.ripe.net</tt> starting at Jun 4th, 2026, 15:50:00 UTC from a relay at <tt>relay.example.net</tt> would be: <tt>https://relay.example.net/.well-known/erik/segment/rpki.ripe.net/1780588200</tt>.
+            As an example, the URI to fetch the segment buffer for <tt>rpki.ripe.net</tt> starting at Jun 4th, 2026, 15:50:00 UTC from a relay at <tt>relay.example.net</tt> would be:
+          </t>
+          <t>
+            <tt>https://relay.example.net/.well-known/erik/segment/rpki.ripe.net/1780588200</tt>
           </t>
         </section>
       </section>
@@ -1165,8 +1184,9 @@ Decimal  Description                 References
           , <contact fullname="Mike Bishop"/>
           , <contact fullname="Kamiel Braet"/>
           , <contact fullname="Loganaden Velvindron"/>
-          and
           , <contact fullname="Lancheng Qin"/>
+          and
+          , <contact fullname="Dirk Doesburg"/>
         for the lovely conversations that led to this proposal.
         The authors wish to thank <contact fullname="Sean Turner"/> and <contact fullname="Russ Housley"/> for their review of the ASN.1 notation.
       </t>
