@@ -512,6 +512,12 @@ END
         Before using a <tt>ErikPartition</tt>, the client <bcp14>MUST</bcp14> verify that all URIs in the accessLocations in the id-ad-signedObject accessMethod instances in the <tt>ErikPartition</tt> are encompassed in the requested <tt>indexScope</tt>.
         A client can then decide whether or not to fetch a given manifest object, by comparing the <tt>manifestNumber</tt> and <tt>thisUpdate</tt> with what's locally cached and what's offered by the remote relay.
       </t>
+     <t>
+      A URI is encompassed by an <tt>indexScope</tt> if, after URI parsing and DNS name normalization, the URI host component is exactly equal to the <tt>indexScope</tt> value.
+      Comparisons are case-insensitive. 
+      A trailing root label MUST NOT be present in an <tt>indexScope</tt>. 
+      Implementations MUST NOT use substring or suffix matching.
+     </t>
       <t>
         A client can compute which products listed in the manifest's <tt>fileList</tt> need to be fetched from one relay or another in order to achieve a successful fetch.
         A client <bcp14>MUST</bcp14> verify that the URI in the accessLocation in one of the id-ad-signedObject accessMethod instances in the manifest's Subject Information Access (SIA) is encompassed in the requested <tt>indexScope</tt>.
