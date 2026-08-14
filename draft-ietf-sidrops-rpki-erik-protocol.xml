@@ -514,7 +514,7 @@ END
       </t>
      <t>
       A URI is encompassed by an `indexScope` if, after URI parsing and DNS name normalization, the URI host component is exactly equal to the `indexScope` value.
-      Comparisons are case-insensitive. A trailing root label MUST be ignored. 
+      Comparisons are case-insensitive. A trailing root label MUST NOT be present in an indexScope. 
       Implementations MUST NOT use substring or suffix matching.
      </t>
       <t>
