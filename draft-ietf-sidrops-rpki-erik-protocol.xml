@@ -1102,7 +1102,7 @@ Decimal  Description                 References
       <section>
         <name>Example ErikIndex</name>
         <t>
-          This object was retrieved from <tt>http://miso.sobornost.net/.well-known/erik/index/rpki.ripe.net</tt>.
+          This object was retrieved from <tt>http://miso.sobornost.net/.well-known/erik/index/rpki.ripe.net</tt>
         </t>
         <sourcecode anchor="ex_index" type="base64" src="rpki.ripe.net.b64"/>
       </section>
@@ -1110,7 +1110,7 @@ Decimal  Description                 References
       <section>
         <name>Example ErikPartition</name>
         <t>
-          This object was retrieved from <tt>https://miso.sobornost.net/.well-known/ni/sha-256/AZmwyRKvBFv4DPl2g5IAhM8BbDvVWzZvgBLjORCoXqM</tt>.
+          This object was retrieved from <tt>https://miso.sobornost.net/.well-known/ni/sha-256/AZmwyRKvBFv4DPl2g5IAhM8BbDvVWzZvgBLjORCoXqM</tt>
         </t>
         <sourcecode anchor="ex_part" type="base64" src="AZmwyRKvBFv4DPl2g5IAhM8BbDvVWzZvgBLjORCoXqM.b64"/>
       </section>
@@ -1118,7 +1118,7 @@ Decimal  Description                 References
       <section>
         <name>Example ErikSegmentIndex</name>
         <t>
-          This object was retrieved from <tt>https://miso.sobornost.net/.well-known/erik/segmentindex/rpki.ripe.rnet</tt>.
+          This object was retrieved from <tt>https://miso.sobornost.net/.well-known/erik/segmentindex/rpki.ripe.net</tt>
         </t>
         <sourcecode anchor="ex_segidx" type="base64" src="segmentindex.example.b64"/>
       </section>
