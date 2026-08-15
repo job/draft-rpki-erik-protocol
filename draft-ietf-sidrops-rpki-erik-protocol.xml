@@ -605,9 +605,6 @@ END
           On the one hand aggressive prefetching might waste bandwidth (i.e. clients download data they might not end up using, or data they had already cached), on the other hand, sending many individual requests for each and every object increases network overhead and latency.
           As a rule of thumb: <xref target="snappf">FQDN Snapshots</xref> are useful for clients with no prior state and <xref target="segmentpf">Segments</xref> are useful in the steady state (when synchronizing every few minutes).
         </t>
-        <t>
-          For efficiency, relay implementations are <bcp14>RECOMMENDED</bcp14> to combine as many DER-encoded objects into as few gzip members as possible (see <xref target="RFC1952" section="2.3"/> for information on gzip members).
-        </t>
       </section>
 
       <section anchor="snappf">
@@ -780,6 +777,9 @@ END
           Using gzip compression on average tends to yield a 20% reduction in size when fetching individual objects and 50% for Prefetch responses.
           Therefore, clients <bcp14>MUST</bcp14> support gzip content coding (<xref target="RFC9110" section="8.4.1.3"/>) and the server <bcp14>MAY</bcp14> assume it without explicit negotiation.
           Clients <bcp14>SHOULD</bcp14> send an <tt>Accept-Encoding</tt> header field in the request, which permits the negotiation of other compression schemes as well.
+        </t>
+        <t>
+          For efficiency, relay implementations are <bcp14>RECOMMENDED</bcp14> to combine as many DER-encoded objects into as few gzip members as possible (see <xref target="RFC1952" section="2.3"/> for information on gzip members).
         </t>
         <t>
           Using a previous version of a RPKI object as a compression dictionary for a newer version enables delivery of a delta-compressed version of the changes, usually resulting in significantly smaller responses than what can be achieved by regular compression alone.
