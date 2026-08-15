@@ -699,55 +699,6 @@ END
       </t>
     </section>
 
-    <section anchor="comparison">
-      <name>Comparison with other RPKI transport protocols</name>
-
-      <t>
-        Ignoring obvious mechanical "on the wire" differences between Erik, Rsync, and RRDP; there are a number of concept differences between the protocols.
-        Rsync and RRDP can be described as "general purpose" synchronisation protocols: they could be used to transfer any arbitrary set of files, on the other hand the Erik protocol is RPKI-specific: part of its signaling layer are RPKI manifest objects, which RPs require as recourse for validation anyway.
-        This property by itself causes a small deduplication in the data to be transferred.
-      </t>
-
-      <section>
-        <name>Comparison with Rsync</name>
-        <t>
-          In Rsync, the server and the client construct and transfer a full listing of all available objects, and then transfer objects as necessary.
-          In effect, this allows clients to 'jump' to the latest repository state, regardless of the state of the local cache.
-        </t>
-        <t>
-          A major downside of Rsync is that the list of files itself can become a burden to transfer.
-          As of June 2025, in order to merely establish whether a client is synchronized or not with the RIPE NCC repository at <tt>rpki.ripe.net</tt>, as much as 5.8 megabytes of data are exchanged without exchanging any RPKI data.
-        </t>
-        <t>
-          Experimentation suggests that when synchronizing once an hour, Erik consumes less network traffic than Rsync generally would consume which, in turn, is less network traffic than RRDP would.
-        </t>
-      </section>
-
-      <section>
-        <name>Comparison with RRDP</name>
-        <t>
-          The key concept in RRDP is that the client downloads a "journal", containing all add/update/delete operations and replays this journal to arrive at the current repository state.
-        </t>
-        <t>
-          A major downside of RRDP is that (depending on the RRDP polling interval) clients end up downloading data which has become outdated.
-          Imagine a hypothetical CA which issues and revokes a ROA every 10 minutes and a client that synchronizes every 60 minutes; in effect the client must fetch 5 outdated states, wasting bandwidth.
-        </t>
-        <t>
-          Experimentation suggests that when synchronizing every 15 minutes, Erik consumes less network traffic than RRDP generally would consume which, in turn, is less network traffic than Rsync would consume.
-        </t>
-
-        <section>
-          <name>Garbage Collection</name>
-          <t>
-            In contrast to RRDP, the Erik protocol has no concept of server-specific "stateful" sessions that persist across polling attempts.
-            This obviates the need for <tt>withdraw</tt> instructions as part of the protocol exchange: clients can simply delete objects that are no longer referenced from their current validation state and refetch them later on if needed.
-          </t>
-        </section>
-
-      </section>
-
-    </section>
-
     <section anchor="operational">
       <name>Operational Considerations</name>
 
