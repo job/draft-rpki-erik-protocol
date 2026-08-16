@@ -290,7 +290,7 @@ ManifestRef ::= SEQUENCE {
 ErikSegmentIndex ::= SEQUENCE {
   version [0]      INTEGER DEFAULT 0,
   segmentScope     IA5String,
-  segmentTime      GeneralizedTime,
+  segmentIndexTime GeneralizedTime,
   hashAlg          DigestAlgorithmIdentifier,
   segmentList      SEQUENCE (SIZE(1..ub-Segments)) OF SegmentRef }
 
@@ -457,9 +457,9 @@ END
           </t>
         </section>
 
-        <section title="the segmentTime field" anchor="segmentTime">
+        <section title="the segmentIndexTime field" anchor="segmentIndexTime">
           <t>
-            The <tt>segmentTime</tt> is the most recent <tt>partitionTime</tt> value among the <tt>ErikPartitions</tt> contained within the segments referenced from the <tt>ErikSegmentIndex</tt> at hand.
+            The <tt>segmentIndexTime</tt> is the most recent <tt>partitionTime</tt> value among the <tt>ErikPartitions</tt> contained within the segments referenced from the <tt>ErikSegmentIndex</tt> at hand.
             The field's value is a rough indication when the last segment was generated and can be used for troubleshooting and measurement purposes.
           </t>
           <t>
@@ -664,7 +664,7 @@ END
 
         <section title="Segment Buffers">
           <t>
-            The URIs to fetch the segment buffers are constructed by transforming the <tt>segmentTime</tt> (<xref target="segmentTime"/>) to integer representation.
+            The URIs to fetch the segment buffers are constructed by transforming the <tt>segmentIndexTime</tt> (<xref target="segmentIndexTime"/>) to integer representation.
             The integer value is the number of seconds, excluding leap seconds, after midnight UTC, January 1, 1970.
             Responses to requests for paths starting with <tt>/.well-known/erik/segment/</tt> are mutable.
           </t>
