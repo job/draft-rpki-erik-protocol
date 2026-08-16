@@ -9,7 +9,7 @@
 
 <rfc xmlns:xi="http://www.w3.org/2001/XInclude"
 category="std"
-docName="draft-ietf-sidrops-rpki-erik-protocol-06"
+docName="draft-ietf-sidrops-rpki-erik-protocol-07"
 ipr="trust200902"
 xml:lang="en"
 sortRefs="true"
@@ -1075,6 +1075,9 @@ Decimal  Description                 References
 
           <dt><tt>http://nyc.rpki-servers.org/</tt></dt>
           <dd>New York, USA, - single node</dd>
+
+          <dt><tt>https://pek.rpki-servers.org/</tt></dt>
+          <dd>Beijing, China - HTTPS, single node</dd>
  
           <dt><tt>http://fnllwqoupfrhso6643whm6lpkgsftjtc6crpehmyz2o7pffirnqy7rad.onion/</tt></dt>
           <dd>Erik relay service via Tor</dd>
