@@ -1134,19 +1134,19 @@ Decimal  Description                 References
       </t>
       <t>
         The authors wish to thank
-          <contact fullname="George Michaelson"/>
-          , <contact fullname="Theo de Raadt"/>
-          , <contact fullname="Bob Beck"/>
-          , <contact fullname="Theo Buehler"/>
-          , <contact fullname="William McCall"/>
-          , <contact fullname="Jasdip Singh"/>
-          , <contact fullname="Michael Hollyman"/>
-          , <contact fullname="Mike Bishop"/>
-          , <contact fullname="Kamiel Braet"/>
-          , <contact fullname="Loganaden Velvindron"/>
-          , <contact fullname="Lancheng Qin"/>
+          <contact fullname="George Michaelson"/>,
+          <contact fullname="Theo de Raadt"/>,
+          <contact fullname="Bob Beck"/>,
+          <contact fullname="Theo Buehler"/>,
+          <contact fullname="William McCall"/>,
+          <contact fullname="Jasdip Singh"/>,
+          <contact fullname="Michael Hollyman"/>,
+          <contact fullname="Mike Bishop"/>,
+          <contact fullname="Kamiel Braet"/>,
+          <contact fullname="Loganaden Velvindron"/>,
+          <contact fullname="Lancheng Qin"/>,
           and
-          , <contact fullname="Dirk Doesburg"/>
+          <contact fullname="Dirk Doesburg"/>
         for the lovely conversations that led to this proposal.
         The authors wish to thank <contact fullname="Sean Turner"/> and <contact fullname="Russ Housley"/> for their review of the ASN.1 notation.
       </t>
