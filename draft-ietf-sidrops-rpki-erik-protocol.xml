@@ -657,7 +657,7 @@ END
             <tt>https://relay.example.net/.well-known/erik/segmentindex/rpki.ripe.net</tt>
           </t>
           <t>
-            A client <bcp14>MAY</bcp14> use the <tt>If-Modified-Since</tt> HTTP header when fetching <tt>ErikSegmentIndex</tt> objects.
+            Clients <bcp14>SHOULD</bcp14> use conditional <tt>GET</tt> requests (<xref target="RFC9110" section="13"/>) for fetching <tt>ErikSegmentIndex</tt> objects, because <tt>HEAD</tt> requests incur a latency penalty due to redundant round-trips.
             Responses to requests for paths starting with <tt>/.well-known/erik/segmentindex/</tt> are mutable.
           </t>
         </section>
