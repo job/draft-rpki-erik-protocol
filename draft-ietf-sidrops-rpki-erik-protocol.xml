@@ -730,9 +730,6 @@ END
           Clients <bcp14>SHOULD</bcp14> send an <tt>Accept-Encoding</tt> header field in the request, which permits the negotiation of other compression schemes as well.
         </t>
         <t>
-          For efficiency, relay implementations are <bcp14>RECOMMENDED</bcp14> to combine as many DER-encoded objects into as few gzip members as possible (see <xref target="RFC1952" section="2.3"/> for information on gzip members).
-        </t>
-        <t>
           Using a previous version of a RPKI object as a compression dictionary for a newer version enables delivery of a delta-compressed version of the changes, usually resulting in significantly smaller responses than what can be achieved by regular compression alone.
           Clients can facilitate delta compression by sending an <tt>Available-Dictionary</tt> request header, using a previously fetched version of the RPKI object as the dictionary.
           It is <bcp14>RECOMMENDED</bcp14> for clients and relays to make use of Compression Dictionary Transport (<xref target="RFC9842"/>).
@@ -926,7 +923,6 @@ Decimal  Description                 References
 
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1034.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1123.xml"/>
-        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.1952.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.5280.xml"/>
         <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.6810.xml"/>
