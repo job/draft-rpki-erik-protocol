@@ -828,7 +828,7 @@ Decimal  Description                 References
             <dt>Security considerations:</dt><dd>This media type contains no active content.</dd>
             <dt>Interoperability considerations:</dt><dd>N/A</dd>
             <dt>Published specification:</dt><dd>[this_document]</dd>
-            <dt>Applications that use this media type:</dt><dd>RPKI operators</dd>
+            <dt>Applications that use this media type:</dt><dd>Tools for RPKI operators</dd>
             <dt>Fragment identifier considerations:</dt><dd>N/A</dd>
             <dt>Additional information:</dt>
             <dd>
@@ -859,7 +859,7 @@ Decimal  Description                 References
             <dt>Security considerations:</dt><dd>This media type contains no active content.</dd>
             <dt>Interoperability considerations:</dt><dd>N/A</dd>
             <dt>Published specification:</dt><dd>[this_document]</dd>
-            <dt>Applications that use this media type:</dt><dd>RPKI operators</dd>
+            <dt>Applications that use this media type:</dt><dd>Tools for RPKI operators</dd>
             <dt>Fragment identifier considerations:</dt><dd>N/A</dd>
             <dt>Additional information:</dt>
             <dd>
@@ -890,7 +890,7 @@ Decimal  Description                 References
             <dt>Security considerations:</dt><dd>This media type contains no active content.</dd>
             <dt>Interoperability considerations:</dt><dd>N/A</dd>
             <dt>Published specification:</dt><dd>[this_document]</dd>
-            <dt>Applications that use this media type:</dt><dd>RPKI operators</dd>
+            <dt>Applications that use this media type:</dt><dd>Tools for RPKI operators</dd>
             <dt>Fragment identifier considerations:</dt><dd>N/A</dd>
             <dt>Additional information:</dt>
             <dd>
