@@ -21,3 +21,6 @@ upload: $(NAME).html
 
 clean:
 	rm -f *.html *.txt *.exp.xml
+
+example:
+	curl https://miso.sobornost.net/.well-known/erik/index/rpki.ripe.net | openssl base64 > rpki.ripe.net.b64
