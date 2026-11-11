@@ -281,7 +281,7 @@ ErikPartition ::= SEQUENCE {
 
 ManifestRef ::= SEQUENCE {
   hash             Digest,
-  size             INTEGER (1000..MAX),
+  size             INTEGER (0..MAX),
   aki              KeyIdentifier,
   manifestNumber   INTEGER (0..MAX),
   thisUpdate       GeneralizedTime,
