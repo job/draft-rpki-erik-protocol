@@ -611,7 +611,7 @@ END
         <name>Prefetching Using Snapshot Buffers</name>
         <t>
           A snapshot buffer contains all signed objects a relay associated with a given FQDN as of the time of the snapshot's production.
-          Snapshot buffers are not necessarily produced in lockstep with updates to the relay's merkle trees, therefore clients <bcp14>MUST</bcp14> perform a tree comparison after fetching a snapshot buffer.
+          Snapshot buffers are not necessarily produced in lockstep with updates to the relay's Merkle trees, therefore clients <bcp14>MUST</bcp14> perform a tree comparison after fetching a snapshot buffer.
         </t>
         <t>
           To avoid wasting resources, relays <bcp14>SHOULD NOT</bcp14> delay snapshot buffer production by more than one hour.
@@ -769,7 +769,7 @@ END
 <![CDATA[
 Decimal  Description                          References
 ----------------------------------------------------------
-  TDB    id-mod-rpkiErikSynchronization-2025  [this_document]
+  TBD    id-mod-rpkiErikSynchronization-2025  [this_document]
 ]]>
         </artwork>
       </section>
